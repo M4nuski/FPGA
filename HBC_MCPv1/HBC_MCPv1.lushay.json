@@ -1,0 +1,14 @@
+ {
+    "name": "HBC_MCPv1",
+    "includedFiles": "all",
+    "externalFlashFiles": [],
+    "top": "top",
+    "constraintsFile": "HBC_MCPv1_1k.cst",
+    "programMode":"ram",
+    "testBenches": "all",
+    "nextPnrGowinOptions": ["--randomize-seed"],
+    "synthGowinOptions": ["-nowidelut"],
+    "baudRate": 115200,
+    "board": "tangnano1k",
+    "skipCstChecking": false
+}

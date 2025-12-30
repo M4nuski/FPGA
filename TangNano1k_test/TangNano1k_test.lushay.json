@@ -1,0 +1,14 @@
+ {
+    "name": "HBC_Interface1",
+    "includedFiles": "all",
+    "externalFlashFiles": [],
+    "top": "top",
+    "constraintsFile": "top.cst",
+    "programMode":"ram",
+    "testBenches": "all",
+    "nextPnrGowinOptions": [],
+    "synthGowinOptions": [],
+    "baudRate": 115200,
+    "board": "tangnano1k",
+    "skipCstChecking": false
+}

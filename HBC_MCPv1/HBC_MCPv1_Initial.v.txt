@@ -1,0 +1,275 @@
+module top (
+    input clk,
+    input RDn,
+    input WRn,
+    input [2:0] Address,
+    inout [7:0] Data
+);
+
+reg [7:0] DataBuffer;
+assign Data = DataBuffer;
+
+reg [15:0] A = 0;
+reg [31:0] Ax = 0;
+reg [15:0] B = 0;
+reg [31:0] Bx = 0;
+reg [31:0] X = 0;
+reg [31:0] Yx = 0;
+//reg [15:0] Y = 0;
+//reg [4:0] bitPos;
+//wire [31:0] Rx;
+//assign  
+
+//reg [7:0] Format = 0;
+// h00 uint8
+// h80 int8
+// h01 uint16
+// h81 int16
+// h10 fixed16
+// h20 float16
+/*localparam FT_Signed = 7;
+localparam FT_16 = 0;
+localparam FT_FX = 4;
+localparam FT_FL = 5;*/
+
+reg [2:0] Operation = 0;
+reg [5:0] Seq = 0; // sequence in operation
+// 7:0 255 6:0 127 5:0 63 4:0 31
+reg [4:0] Status = 0;
+localparam ST_B = 0;
+localparam ST_Z = 1;
+localparam ST_C = 2;
+localparam ST_N = 3;
+localparam ST_V = 4;
+
+
+
+// read write registers
+// int16 add sub mul div
+// int16 to fixed16
+// fixed16 to int16
+
+// Address:
+// 0 Ah (D.A)
+// 1 Al (D.B)
+// 2 Bh (D.A)
+// 3 Bl (D.B)
+// 4 Xh (Q.A) mul MSB, Div h
+// 5 Xl (Q.B)          Div l
+// 6 Yh (Q.C)          Mod h
+// 7 Yl (Q.D) mul LSB, Mod l
+// 8
+// 9
+// A
+// B
+// C
+// D ////Format [ 7:Signed, 3-0:Type ]
+// E ////Operation
+// F Status [ 7:Error, 4:oVerflow, 3: Neg, 2:Carry, 1:Zero, 0:Done , op2 op1 op0] 
+
+// Type:
+// 000 uInt8    0 - 255
+// 001 Int8     -128 - 127
+// 001 uInt16   0 - 65535
+// 000 Int16    -32768 - 32767
+///////////////// 010 uFixed16 10 int, 6 fract       ???????      0 - 1023, 1/64th  
+// 000 Fixed16 1 sign, 10 int, 5 fract          -512 - 511, 1/32th
+// 011 Float16 1 sign, 1 expSign, 4 exp, 10 fract (+1 explicit)
+
+/* Op: (61)
+    Basic (8)
+        00 Add     X = A + B
+        01 Sub     X = A - B
+        02 Mul     XY = A * B
+        03 DivMod  X = A / B, Y = A % B
+        04 DivFrc  XY = A / B (int part : fract part)
+
+        Sqr     XY = A * A
+        Sqrt    X = Sqrt(A)
+        Len     X = Sqrt(A * A + B * B)
+        Pow     XY = A ^ B
+
+    Direct (11)
+        Div2    X = A / 2
+        Mul2    XY = A * 2
+        NegA    A = -A
+        NegB    B = -B
+        IncA    A = A + 1
+        IncB    B = B + 1
+        DecA    A = A - 1
+        DecB    B = B - 1
+
+    Trig (4)
+        Sin     X = Sin(A)
+        Cos     X = Cos(A)
+        Tan     X = Tan(A)
+        ATan    X = ATan(A)
+
+    Moves (10)
+        X to A
+        X to B
+        Y to A
+        Y to B
+        XY to AB
+        Swap A and B
+
+        Push A
+        Pull A
+        Push X
+        Pull X
+
+    Format Conversions (32)
+        ToFixed (uInt8, Int8, uInt16, Int16, Float16)
+            in situ A
+            in situ B
+            in situ X
+            in situ Y
+            X to A
+            Y to A
+            XY to X (32 -> 16 if uInt16 or Int16)
+            XY to A (32 -> 16 if uInt16 or Int16)
+
+        ToFloat (uInt8, Int8, uInt16, Int16, Fixed16)
+            in situ A
+            in situ B
+            in situ X
+            in situ Y
+            X to A
+            Y to A
+            XY to X (32 -> 16 if uInt16 or Int16)
+            XY to A (32 -> 16 if uInt16 or Int16)
+
+        ToInt16 (Int8 (sign extend), Fixed16, Float16)
+            in situ A
+            in situ B
+            in situ X
+            in situ Y
+            X to A
+            Y to A
+            XY to X (32 -> 16 if uInt16 or Int16)
+            XY to A (32 -> 16 if uInt16 or Int16)
+
+        ToUInt16 (Int8 (sign remove), Fixed16, Float16)
+            in situ A
+            in situ B
+            in situ X
+            in situ Y
+            X to A
+            Y to A
+            XY to X (32 -> 16 if uInt16 or Int16)
+            XY to A (32 -> 16 if uInt16 or Int16)
+
+
+*/
+
+always @(posedge clk) begin
+    if ((WRn == 0) && (RDn == 1)) begin // write register
+        case (Address)
+            0: A [15:8] <= Data;
+            1: A [7:0]  <= Data;
+            2: B [15:8] <= Data;
+            3: B [7:0]  <= Data;
+         //   4: X [31:24] <= Data; // Xh
+          //  5: X [23:16] <= Data; // Xl
+          //  6: X [15:8] <= Data;  // Yh
+          //  7: X [7:0]  <= Data;  // Yl
+           // 13: Format <= Data;
+            15: begin
+                Operation <= Data[2:0];
+                Status[ST_B] <= 1;
+                Seq <= 0;
+            end
+        endcase
+    end else if ((WRn == 1) && (RDn == 0)) begin // read register
+        case (Address)
+            0: DataBuffer <= A [15:8];
+            1: DataBuffer <= A [7:0];
+            2: DataBuffer <= B [15:8];
+            3: DataBuffer <= B [7:0];
+            4: DataBuffer <= X [31:24];
+            5: DataBuffer <= X [23:16];
+            6: DataBuffer <= X [15:8];
+            7: DataBuffer <= X [7:0];
+            15: DataBuffer <= {Status, Operation};
+        endcase
+    end else DataBuffer <= 8'bzzzzzzzz;
+
+    if (Status[ST_B] == 1) begin
+        Seq <= Seq + 1;
+        case (Operation)
+            0: begin
+                {Status[ST_C], X[31:16]} <= A[15:0] + B[15:0]; // add
+                Status[ST_B] <= 0;
+            end
+            1: begin
+                {Status[ST_C], X[31:16]} <= A[15:0] - B[15:0]; // sub
+                Status[ST_B] <= 0;
+            end
+            2: begin //mult, signed 16 bit x 16 bits
+                if (Seq == 0) begin
+                    X <= { (A[15] ^ B[15]), 31'd0 }; // sign bit, clear
+                    Bx <= { 17'd0, (B[15] == 0) ? B[14:0] : -B[14:0] }; // clear and copy except sign
+                    Ax[15:0] <= {  1'd0, (A[15] == 0) ? A[14:0] : -A[14:0] }; // copy except sign
+                end else if (Seq <= 30) begin 
+                    // less resources than add and shift at the same time
+                    if (Seq[0] == 1) begin // odd, add if set
+                        if (Ax[0] == 1) X <= X + Bx;
+                    end else begin // even, shift
+                        Ax[15:0] <= Ax[15:0] >> 1;
+                        Bx <= Bx << 1;//
+                    end
+                end else begin
+                    Status[ST_B] <= 0; // not busy
+                    if (X[31] == 1) X[30:0] <= -X[30:0];
+                end
+            end // end mult op
+
+
+            // DIV 16 / 16
+            // X = A / B, Y = A % B
+            // Bx = uB << 15
+            // Ax = uA
+            // A  0000 0000 0000 0000 0EDC BA98 7654 3210
+            // B  000E DCBA 9876 5432 10
+            // loop if less set bit and sub
+            //      shift B right
+            3: begin 
+                if (Seq == 0) begin // init
+                    X <= { (A[15] ^ B[15]), 31'd0 }; // sign bit, clear
+                    Bx <= { 3'd0, (B[15] == 0) ? B[14:0] : -B[14:0], 14'd0 }; // copy positive part
+                    Ax <= { 17'd0, (A[15] == 0) ? A[14:0] : -A[14:0] }; // copy positive part
+                   // bitPos <= 5'd30;
+                   Yx <= 32'h40000000;
+                end else if (Seq <= 30) begin // calc
+                    if (Seq[0] == 1) begin // odd step
+                        if (Bx <= Ax) begin
+                            X <= X | Yx;
+                            //X[bitPos] <= 1'b1;
+                           //X <= X | (1'b1 << bitPos);
+                            Ax <= Ax - Bx;
+                        end
+                    end else begin // even step
+                        Bx <= Bx >> 1;
+                        Yx <= Yx >> 1;
+                        //bitPos <= bitPos - 5'b1;
+                        if ((Ax[31] == 1) || (Ax[14:0] == 15'd0)) Seq <= 31;
+                    end 
+                end else if (Seq == 31) begin // remainder 
+                    X[14:0] <= Ax[14:0]; 
+                end else begin //32 sign and finalize
+                    if (X[31] == 1) begin
+                        X[30:16] <= -X[30:16];
+                        X[15:0] <= -X[15:0];
+                    end
+                    Status[ST_B] <= 0;
+                end
+            end // end divmod16
+
+
+        endcase
+    end
+end
+
+
+
+endmodule

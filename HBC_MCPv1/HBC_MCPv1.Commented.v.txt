@@ -1,0 +1,292 @@
+module top (
+    input clk,
+    input RDn,
+    input WRn,
+    input [2:0] Address,
+    inout [7:0] Data
+);
+
+// Tang Nano 1K
+// Simple Signed Int16 Math coprocessor
+// 8 bit parallel interface
+
+// Address map
+// write
+//  0: Ah (D.A)
+//  1: Al (D.B)
+//  2: Bh (D.A)
+//  3: Bl (D.B)
+//  7: op
+//      0: Mult 16x16 to 32 bit
+//      1: Div and Modulus
+//      2: Div with 16 bit fractional part
+//      3: Sqrt with 8 bit fractional part
+// read
+//  0: Xh (Q.A) Mul MSB, Div h, Div h,       Sqrt h
+//  1: Xl (Q.B)          Div l, Div l,       Sqrt l
+//  2: Yh (Q.C)          Mod h, Div fract h, Sqrt fract
+//  3: Yl (Q.D) Mul LSB, Mod l, Div fract l
+//  7: Busy 
+
+// yosys need -nowidelut
+
+reg [7:0] DataBuffer;
+assign Data = DataBuffer;
+
+reg [15:0] A = 0; // input register
+reg [31:0] Ax = 0; // work register
+reg [15:0] B = 0; // input register
+reg [31:0] Bx = 0; // work register
+reg [31:0] X = 0; // output register
+//reg [31:0] Yx = 0;
+//wire [31:0] Yx;
+//assign Yx = Ax - (X + Bx);
+
+reg [1:0] Operation = 0;
+reg [6:0] Seq = 0; // sequence in operation
+// 7:0 255 6:0 127 5:0 63 4:0 31
+//reg [4:0] bitPos = 0;
+
+reg Status = 0;
+//reg [4:0] Status = 0;
+/*
+localparam ST_B = 0;
+localparam ST_Z = 1;
+localparam ST_C = 2;
+localparam ST_N = 3;
+localparam ST_V = 4;
+*/
+
+
+// read write registers
+// int16 add sub mul div
+// sqrt?
+
+// int16 to fixed16
+// fixed16 to int16
+
+// Address:
+// write 
+// 0 Ah (D.A)
+// 1 Al (D.B)
+// 2 Bh (D.A)
+// 3 Bl (D.B)
+// 7 op
+
+// read
+// 0 Xh (Q.A) mul MSB, Div h
+// 1 Xl (Q.B)          Div l
+// 2 Yh (Q.C)          Mod h
+// 3 Yl (Q.D) mul LSB, Mod l
+// 7 Status 
+
+//[ 7:oVerflow, 6: Neg, 5:Carry, 4:Zero, 3:Done , op2, op1, op0] 
+
+/* Op: 
+    Signed Int16
+        02 Mul     XY = A * B   16 steps
+        03 DivMod  X = A / B, Y = A % B    32 steps
+        04 DivFrc  X.Y = A / B (X: int part, Y: fract part)  64 steps
+        05 Sqrt    X.Y = Sqrt(A) (X: int part, Y: fract part)  32 steps
+
+        00 Add     X = A + B 
+// not implemented:
+        01 Sub     X = A - B
+        //05 Sqr     XY = A * A
+        06 Len     X = Sqrt(A * A + B * B)
+        07 Pow     XY = A ^ B
+*/
+
+always @(posedge clk) begin
+    if ((WRn == 0) && (RDn == 1)) begin // write register
+        case (Address)
+            0: A [15:8] <= Data;
+            1: A [7:0]  <= Data;
+            2: B [15:8] <= Data;
+            3: B [7:0]  <= Data;
+            7: begin
+                Operation <= Data[1:0];
+                Status <= 1;
+                Seq <= 0;
+            end
+        endcase
+    end else if ((WRn == 1) && (RDn == 0)) begin // read register
+        case (Address)
+            0: DataBuffer <= X [31:24];
+            1: DataBuffer <= X [23:16];
+            2: DataBuffer <= X [15:8];
+            3: DataBuffer <= X [7:0];
+            7: DataBuffer <= {7'd0, Status};
+        endcase
+    end else DataBuffer <= 8'bzzzzzzzz;
+
+    if (Status == 1) begin
+        Seq <= Seq + 1;
+        case (Operation)
+           /* 0: begin
+                {Status[ST_C], X[31:16]} <= A[15:0] + B[15:0]; // add
+                Status <= 0;
+            end*/
+         /*   1: begin
+                {Status[ST_C], X[31:16]} <= A[15:0] - B[15:0]; // sub
+                Status <= 0;
+            end*/
+            0: begin //mult, signed 16 bit x 16 bits
+                if (Seq == 0) begin
+                    X <= { (A[15] ^ B[15]), 31'd0 }; // sign bit, clear
+                    Bx <= { 17'd0, (B[15] == 0) ? B[14:0] : -B[14:0] }; // clear and copy except sign
+                    Ax[15:0] <= {  1'd0, (A[15] == 0) ? A[14:0] : -A[14:0] }; // copy except sign
+                end else if (Seq <= 16) begin 
+                    if (Ax[0] == 1) X <= X + Bx;
+                    Ax[15:0] <= Ax[15:0] >> 1;
+                    Bx <= Bx << 1;//
+                end else begin
+                    Status <= 0; // not busy
+                    if (X[31] == 1) X[30:0] <= -X[30:0]; 
+                end
+            end // end mult op
+
+
+            // DIV 16 / 16
+            // X = A / B, Y = A % B
+            // Bx = uB << 15
+            // Ax = uA
+            // A  0000 0000 0000 0000 0EDC BA98 7654 3210
+            // B  000E DCBA 9876 5432 10
+            // loop if less set bit and sub
+            //      shift B right
+
+            //cell arc lut4 alu dff
+            //447 2293  30  22 X | Yx >> 1
+            //441 2255  29  23 remainder direct
+            //470 2338  32  23 no half steps
+            //442 2366  32  22 with 1 << bitpos
+            //461 2235  34  23 2 setup steps
+            //430 2229  31  22 (1 << 30-((Seq-1)/2));
+
+            //429 2207  31  22  17 faster Mult with no half steps
+            //426 2191  31  22  17 removed neg check after div step
+
+            //572 2678  45  23  17 added DivFract op
+                    // 697c 3443a 55lut4 32alu 90MHz
+                    // 765c 3661a 61lut4 33alu 65MHz with if then else for Operation select
+                    // 702c 3403s 56lut4 31alu 94MHz with case for Seq select in Sqrt16.8
+
+            1: begin 
+                if (Seq == 0) begin // init
+                    X <= { (A[15] ^ B[15]), 31'd0 }; // sign bit, clear
+                    Ax <= { 17'd0, (A[15] == 0) ? A[14:0] : -A[14:0] }; // copy positive part
+                    Bx <= { 3'd0, (B[15] == 0) ? B[14:0] : -B[14:0], 14'd0 }; // copy positive part
+                end else if (Seq <= 30) begin // calc
+                    if (Seq[0] == 1) begin // odd step
+                        if (Bx <= Ax) begin
+                            X <= X | (1 << 30-((Seq-1)/2));
+                            Ax <= Ax - Bx;
+                        end
+                    end else begin // even step
+                        Bx <= Bx >> 1;
+                        if (Ax[14:0] == 15'd0) Seq <= 31;
+                    end
+                end else if (Seq == 31) begin
+                    X[14:0] <= Ax[14:0]; // remainder 
+                end else begin //32 sign and finalize
+                    if (X[31] == 1) begin
+                        X[30:16] <= -X[30:16];
+                        X[15:0] <= -X[15:0];
+                    end
+                    Status <= 0;
+                end
+            end // end divmod16
+
+
+            2: begin // divfract16
+                if (Seq == 0) begin // init
+                    X <= { (A[15] ^ B[15]), 31'd0 }; // sign bit, clear
+                    Ax <= { 17'd0, (A[15] == 0) ? A[14:0] : -A[14:0] }; // copy positive part
+                    Bx <= { 3'd0, (B[15] == 0) ? B[14:0] : -B[14:0], 14'd0 }; // copy positive part
+                end else if (Seq <= 62) begin // calc
+                    if (Seq[0] == 1) begin // odd step
+                        if (Bx <= Ax) begin
+                            X <= X | (1 << 30-((Seq-1)/2));
+                            Ax <= Ax - Bx;
+                        end
+                    end else begin // even step
+                        
+                        if (Ax[29:0] == 30'd0) Seq <= 63;
+                        if (Seq == 6'd30) begin // fraction
+                            Ax <= Ax << 16; 
+                            Bx <= Bx << 15;
+                        end else Bx <= Bx >> 1;
+                    end
+                end else begin //32 sign and finalize
+                    if (X[31] == 1)  X[30:0] <= -X[30:0];
+                    Status <= 0;
+                end
+            end // end divfract16
+
+            3: begin // isqrt
+                if (Seq == 0) begin //0 init
+                    Ax <= { 1'd0, A[14:0], 16'd0 }; // shifted by 16 bits to allow fractional part
+                    X <= 32'd0; // clear result
+                    Bx <= 32'h40000000;
+                end else if (Seq <= 63) begin //1-32 reduce
+                 // 4 substeps 63 with Yx pre calc
+                   /*case (Seq[1:0]) 
+                        1: begin
+                            if (Bx == 0) Seq <= 64;
+                          //  Yx <= Ax - (X + Bx);
+                        end
+                        2: if (Yx[31] == 0) begin
+                            Ax <= Yx;
+                            X <= X + (Bx << 1);
+                        end
+                        3: X <= X >> 1;
+                        0: Bx <= Bx >> 2;
+                    endcase*/
+                // 4 substeps 63 
+                   /* case (Seq[1:0]) 
+                        1: if (Bx == 0) Seq <= 64;
+                        2: if (Ax >= (X + Bx)) begin
+                            Ax <= Ax - (X + Bx);
+                            X <= X + (Bx << 1);
+                        end
+                        3: X <= X >> 1;
+                        0: Bx <= Bx >> 2;
+                    endcase*/
+                // 2 substeps
+                // 703 3464 56lut4 31alu 16dff
+                // 718 3522 57lut4 31alu 16dff with Yx wire sub
+                    if (Seq[0] == 1) begin // odd step
+                        if (Bx == 0) begin
+                            Seq <= 64;
+                        end else if (Ax >= (X + Bx)) begin
+                            Ax <= Ax - (X + Bx);
+                            X <= X + (Bx << 1);
+                        end
+                    end else begin // even step
+                        X <= X >> 1;
+                        Bx <= Bx >> 2;
+                    end
+                    // inline sequential
+                    /*if (Ax >= (X + Bx)) begin
+                        Ax = Ax - (X + Bx);
+                        X = X + (Bx << 1);
+                    end
+                    X = X >> 1;
+                    Bx = Bx >> 2;
+                    if (Bx == 0) Seq <= 64;*/
+
+
+                end else begin // finalize
+                    Status <= 0;
+                    X <= X << 8; // offset back to align fraction
+                end
+            end // end isqrt
+
+        endcase
+    end
+end
+
+
+
+endmodule

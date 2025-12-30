@@ -1,0 +1,38 @@
+IO_LOC  "port13" 73;
+IO_PORT "port13" DRIVE=8;
+
+IO_LOC  "port12" 74;
+IO_PORT "port12" DRIVE=8;
+
+IO_LOC  "port11" 75;
+IO_PORT "port11" DRIVE=8;
+
+IO_LOC  "lcd_cs" 48;
+IO_PORT "lcd_cs" DRIVE=8 PULL_MODE=UP;
+
+IO_LOC  "lcd_rs" 49;
+IO_PORT "lcd_rs" DRIVE=8 PULL_MODE=UP;
+
+IO_LOC  "lcd_reset" 47;
+IO_PORT "lcd_reset" DRIVE=8 PULL_MODE=UP;
+
+IO_LOC  "lcd_mosi" 77;
+IO_PORT "lcd_mosi" DRIVE=8 PULL_MODE=UP;
+
+IO_LOC  "lcd_clk" 76;
+IO_PORT "lcd_clk" DRIVE=8 PULL_MODE=UP;
+
+IO_LOC  "clk" 52;
+IO_PORT "clk" PULL_MODE=UP;
+
+IO_LOC  "flash_clk" 59;
+IO_PORT "flash_clk" DRIVE=8 PULL_MODE=UP;
+
+IO_LOC  "flash_miso" 62;
+IO_PORT "flash_miso" DRIVE=8 PULL_MODE=UP;
+
+IO_LOC  "flash_mosi" 61;
+IO_PORT "flash_mosi" DRIVE=8 PULL_MODE=UP;
+
+IO_LOC  "flash_cs" 60;
+IO_PORT "flash_cs" DRIVE=8 PULL_MODE=UP;
