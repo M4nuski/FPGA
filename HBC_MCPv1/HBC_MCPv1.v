@@ -49,7 +49,7 @@ reg Status = 0; // 1: busy
 // Main state machine
 always @(posedge clk) begin
     // write register
-    if ((WRn == 0) && (RDn == 1)) begin 
+    if ((WRn == 1'b0) && (RDn == 1'b1)) begin 
         case (Address)
             0: A [15:8] <= Data;
             1: A [7:0]  <= Data;
@@ -57,12 +57,12 @@ always @(posedge clk) begin
             3: B [7:0]  <= Data;
             7: begin
                 Operation <= Data[1:0];
-                Status <= 1;
-                Seq <= 0;
+                Status <= 1'b1;
+                Seq <= 7'd0;
             end
         endcase
     // read register
-    end else if ((WRn == 1) && (RDn == 0)) begin 
+    end else if ((WRn == 1'b1) && (RDn == 1'b0)) begin 
         case (Address)
             0: DataBuffer <= X [31:24];
             1: DataBuffer <= X [23:16];
@@ -74,45 +74,45 @@ always @(posedge clk) begin
     end else DataBuffer <= 8'bzzzzzzzz;
 
     // process operation
-    if (Status == 1) begin
+    if (Status == 1'b1) begin
         Seq <= Seq + 1;
         case (Operation)
             //mult16
             0: begin 
-                if (Seq == 0) begin // init
+                if (Seq == 7'd0) begin // init
                     X <= { (A[15] ^ B[15]), 31'd0 }; // sign bit, clear
-                    Bx <= { 17'd0, (B[15] == 0) ? B[14:0] : -B[14:0] }; // clear and copy except sign
-                    Ax[15:0] <= {  1'd0, (A[15] == 0) ? A[14:0] : -A[14:0] }; // copy except sign
-                end else if (Seq <= 16) begin 
-                    if (Ax[0] == 1) X <= X + Bx;
+                    Bx <= { 17'd0, (B[15] == 1'b0) ? B[14:0] : -B[14:0] }; // clear and copy except sign
+                    Ax[15:0] <= {  1'd0, (A[15] == 1'b0) ? A[14:0] : -A[14:0] }; // copy except sign
+                end else if (Seq <= 7'd16) begin 
+                    if (Ax[0] == 1'b1) X <= X + Bx;
                     Ax[15:0] <= Ax[15:0] >> 1;
                     Bx <= Bx << 1;
                 end else begin
                     Status <= 0; // not busy
-                    if (X[31] == 1) X[30:0] <= -X[30:0]; // re-adjust sign
+                    if (X[31] == 1'b1) X[30:0] <= -X[30:0]; // re-adjust sign
                 end
             end // end mult16 op
 
             // divmod16
             1: begin 
-                if (Seq == 0) begin // init
+                if (Seq == 7'd0) begin // init
                     X <= { (A[15] ^ B[15]), 31'd0 }; // sign bit, clear
-                    Ax <= { 17'd0, (A[15] == 0) ? A[14:0] : -A[14:0] }; // copy positive part
-                    Bx <= { 3'd0, (B[15] == 0) ? B[14:0] : -B[14:0], 14'd0 }; // copy positive part
-                end else if (Seq <= 30) begin // calc
-                    if (Seq[0] == 1) begin // odd step
+                    Ax <= { 17'd0, (A[15] == 1'b0) ? A[14:0] : -A[14:0] }; // copy positive part
+                    Bx <= { 3'd0, (B[15] == 1'b0) ? B[14:0] : -B[14:0], 14'd0 }; // copy positive part
+                end else if (Seq <= 7'd30) begin // calc
+                    if (Seq[0] == 1'd1) begin // odd step
                         if (Bx <= Ax) begin
                             X <= X | (1 << 30-((Seq-1)/2));
                             Ax <= Ax - Bx;
                         end
                     end else begin // even step
                         Bx <= Bx >> 1;
-                        if (Ax[14:0] == 15'd0) Seq <= 31;
+                        if (Ax[14:0] == 15'd0) Seq <= 7'd31;
                     end
-                end else if (Seq == 31) begin
+                end else if (Seq == 7'd31) begin
                     X[14:0] <= Ax[14:0]; // remainder 
                 end else begin //32 sign and finalize
-                    if (X[31] == 1) begin
+                    if (X[31] == 1'b1) begin
                         X[30:16] <= -X[30:16];
                         X[15:0] <= -X[15:0];
                     end
@@ -122,39 +122,39 @@ always @(posedge clk) begin
 
             // divfract16
             2: begin 
-                if (Seq == 0) begin // init
+                if (Seq == 7'd0) begin // init
                     X <= { (A[15] ^ B[15]), 31'd0 }; // sign bit, clear
-                    Ax <= { 17'd0, (A[15] == 0) ? A[14:0] : -A[14:0] }; // copy positive part
-                    Bx <= { 3'd0, (B[15] == 0) ? B[14:0] : -B[14:0], 14'd0 }; // copy positive part
-                end else if (Seq <= 62) begin // calc
-                    if (Seq[0] == 1) begin // odd step
+                    Ax <= { 17'd0, (A[15] == 1'b0) ? A[14:0] : -A[14:0] }; // copy positive part
+                    Bx <= { 3'd0, (B[15] == 1'b0) ? B[14:0] : -B[14:0], 14'd0 }; // copy positive part
+                end else if (Seq <= 7'd62) begin // calc
+                    if (Seq[0] == 1'd1) begin // odd step
                         if (Bx <= Ax) begin
                             X <= X | (1 << 30-((Seq-1)/2));
                             Ax <= Ax - Bx;
                         end
                     end else begin // even step
-                        if (Ax[29:0] == 30'd0) Seq <= 63;
-                        if (Seq == 6'd30) begin // fraction
+                        if (Ax[29:0] == 30'd0) Seq <= 7'd63;
+                        if (Seq == 7'd30) begin // fraction
                             Ax <= Ax << 16; 
                             Bx <= Bx << 15;
                         end else Bx <= Bx >> 1;
                     end
                 end else begin //32 sign and finalize
-                    if (X[31] == 1) X[30:0] <= -X[30:0];
+                    if (X[31] == 1'b1) X[30:0] <= -X[30:0];
                     Status <= 0;
                 end
             end // end divfract16
 
             // sqrt16.8
             3: begin
-                if (Seq == 0) begin //0 init
+                if (Seq == 7'd0) begin //0 init
                     Ax <= { 1'd0, A[14:0], 16'd0 }; // target, shifted by 16 bits to allow fractional part
                     X <= 32'd0; // clear result
                     Bx <= 32'h40000000; // initial guess
-                end else if (Seq <= 34) begin //1-34 reduce
-                    if (Seq[0] == 1) begin // odd step
-                        if (Bx == 0) begin
-                            Seq <= 35;
+                end else if (Seq <= 7'd34) begin //1-34 reduce
+                    if (Seq[0] == 1'd1) begin // odd step
+                        if (Bx == 32'd0) begin
+                            Seq <= 7'd35;
                         end else if (Ax >= (X + Bx)) begin
                             Ax <= Ax - (X + Bx);
                             X <= X + (Bx << 1);
@@ -164,7 +164,7 @@ always @(posedge clk) begin
                         Bx <= Bx >> 2;
                     end
                 end else begin //35 finalize
-                    Status <= 0;
+                    Status <= 1'b0;
                     X <= X << 8; // offset back to align fraction
                 end
             end // end sqrt16.8

@@ -6,8 +6,8 @@
     "constraintsFile": "HBC_MCPv1_1k.cst",
     "programMode":"ram",
     "testBenches": "all",
-    "nextPnrGowinOptions": ["--randomize-seed"],
-    "synthGowinOptions": ["-nowidelut"],
+    "nextPnrGowinOptions": ["--placer-heap-cell-placement-timeout=4"],
+    "synthGowinOptions": ["-abc9", "-nowidelut"],
     "baudRate": 115200,
     "board": "tangnano1k",
     "skipCstChecking": false
