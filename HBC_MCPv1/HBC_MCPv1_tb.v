@@ -30,13 +30,22 @@ assign dataBus = DataBuffer;
 reg [2:0] addressBus = 0;
 reg readBus = 1;
 reg writeBus = 1;
+reg testLen = 0;
 
 localparam OP_sInt16_MULT = 0;
 localparam OP_sInt16_DIVMOD = 1;
 localparam OP_sInt16_DIVFRACT = 2;
 localparam OP_sInt16_SQRT = 3;
 
-top Int16MCP (
+top_v1 Int16MCP (
+    clk,
+    readBus,
+    writeBus,
+    addressBus,
+    dataBus
+);
+
+top_v1b Int16LEN (
     clk,
     readBus,
     writeBus,
@@ -238,6 +247,67 @@ initial begin
     // SQRT(32767) = 181.016  0xB5.04
     `testop(8'h7F, 8'hFF, 8'h00, 8'h00, OP_sInt16_SQRT);
     `assert(Int16MCP.X, 32'h00B50400);
+
+
+// test for SRQ and LEN version
+testLen <= 1;
+
+    // SQR
+    // SQR(0) = 0
+    `testop(8'h00, 8'h00, 8'h00, 8'h00, 0);
+    `assert(Int16LEN.X, 32'h00000000);
+
+    // SQR(1) = 1
+    `testop(8'h00, 8'h01, 8'h00, 8'h00, 0);
+    `assert(Int16LEN.X, 32'h00000001);
+
+    // SQR(2) = 4
+    `testop(8'h00, 8'h02, 8'h00, 8'h00, 0);
+    `assert(Int16LEN.X, 32'h00000004);
+
+    // SQR(10) = 100
+    `testop(8'h00, 8'h0A, 8'h00, 8'h00, 0);
+    `assert(Int16LEN.X, 32'h00000064);
+    
+    // SQR(-11) = 121
+    `testop(8'hFF, 8'hF5, 8'h00, 8'h00, 0);
+    `assert(Int16LEN.X, 32'h00000079);
+
+    // SQR(0x5555) = 1C71 8E39
+    `testop(8'h55, 8'h55, 8'h00, 8'h00, 0);
+    `assert(Int16LEN.X, 32'h1C718E39);
+
+    // SQR(0x7FFF) = 3FFF 0001
+    `testop(8'h7F, 8'hFF, 8'h00, 8'h00, 0);
+    `assert(Int16LEN.X, 32'h3FFF0001);
+
+    // LEN(0, 0) = 0
+    `testop(8'h00, 8'h00, 8'h00, 8'h00, 1);
+    `assert(Int16LEN.X, 32'h00000000);
+
+    // LEN(0, 1) = 1
+    `testop(8'h00, 8'h00, 8'h00, 8'h01, 1);
+    `assert(Int16LEN.X, 32'h00000001);
+
+    // LEN(0, 10) = 10
+    `testop(8'h00, 8'h00, 8'h00, 8'h0A, 1);
+    `assert(Int16LEN.X, 32'h0000000A);
+
+    // LEN(1, 0) = 1
+    `testop(8'h00, 8'h01, 8'h00, 8'h00, 1);
+    `assert(Int16LEN.X, 32'h00000001);
+
+    // LEN(10, 0) = 10
+    `testop(8'h00, 8'h0A, 8'h00, 8'h00, 1);
+    `assert(Int16LEN.X, 32'h0000000A);
+
+    // LEN(3, 4) = 5
+    `testop(8'h00, 8'h03, 8'h00, 8'h04, 1);
+    `assert(Int16LEN.X, 32'h00000005);
+
+    // LEN(1000, 1000) = 0x3E8 , 0x3E8 = 0x586
+    `testop(8'h03, 8'hE8, 8'h03, 8'hE8, 1);
+    `assert(Int16LEN.X, 32'h00000586);
 
     $finish;
 

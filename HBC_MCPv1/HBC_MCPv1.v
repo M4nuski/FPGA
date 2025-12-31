@@ -6,7 +6,7 @@
 // pass at board's default 27MHz clock
 // yosys need -nowidelut
 
-module top (
+module top_v1 (
     input clk,
     input RDn,
     input WRn,
@@ -82,10 +82,10 @@ always @(posedge clk) begin
                 if (Seq == 7'd0) begin // init
                     X <= { (A[15] ^ B[15]), 31'd0 }; // sign bit, clear
                     Bx <= { 17'd0, (B[15] == 1'b0) ? B[14:0] : -B[14:0] }; // clear and copy except sign
-                    Ax[15:0] <= {  1'd0, (A[15] == 1'b0) ? A[14:0] : -A[14:0] }; // copy except sign
+                    Ax[14:0] <= (A[15] == 1'b0) ? A[14:0] : -A[14:0]; // copy except sign
                 end else if (Seq <= 7'd16) begin 
                     if (Ax[0] == 1'b1) X <= X + Bx;
-                    Ax[15:0] <= Ax[15:0] >> 1;
+                    Ax[14:0] <= Ax[14:0] >> 1;
                     Bx <= Bx << 1;
                 end else begin
                     Status <= 0; // not busy

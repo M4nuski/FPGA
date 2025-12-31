@@ -2,7 +2,7 @@
     "name": "HBC_MCPv1",
     "includedFiles": "all",
     "externalFlashFiles": [],
-    "top": "top",
+    "top": "top_v1b",
     "constraintsFile": "HBC_MCPv1_1k.cst",
     "programMode":"ram",
     "testBenches": "all",
