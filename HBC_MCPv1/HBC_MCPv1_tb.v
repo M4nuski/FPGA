@@ -89,15 +89,62 @@ initial begin
     `testop(8'h7F, 8'hFF, 8'h7F, 8'hFF, OP_sInt16_MULT);
     `assert(Int16MCP.X, 32'h3FFF0001);
 
+    // 8001 x 8001 = 3FFF 0001
+    `testop(8'h80, 8'h01, 8'h80, 8'h01, OP_sInt16_MULT);
+    `assert(Int16MCP.X, 32'h3FFF0001);
+
+    // 8000 x 8000 = 0000 0000 / overflow
+    `testop(8'h80, 8'h00, 8'h80, 8'h00, OP_sInt16_MULT);
+    `assert(Int16MCP.X, 32'h00000000);
+
+    // 0 x 0 = 0
+    // 0000 x 0000 = 0000 0000 
+    `testop(8'h00, 8'h00, 8'h00, 8'h00, OP_sInt16_MULT);
+    `assert(Int16MCP.X, 32'h00000000);
+
+    // 0 x 7FFF = 0
+    // 0000 x 7FFF = 0000 0000
+    `testop(8'h00, 8'h00, 8'h7F, 8'hFF, OP_sInt16_MULT);
+    `assert(Int16MCP.X, 32'h00000000);
+
+    // 7FFF x 0 = 0
+    // 0000 x 7FFF = 0000 0000
+    `testop(8'h7F, 8'hFF, 8'h00, 8'h00, OP_sInt16_MULT);
+    `assert(Int16MCP.X, 32'h00000000);
+
+    // 1 x 1 = 1
+    // 0001 x 0001 = 0000 0001 
+    `testop(8'h00, 8'h01, 8'h00, 8'h01, OP_sInt16_MULT);
+    `assert(Int16MCP.X, 32'h00000001);
+
+    // 1 x 7FFF = 7FFF
+    // 0001 x 7FFF = 0000 7FFF
+    `testop(8'h00, 8'h01, 8'h7F, 8'hFF, OP_sInt16_MULT);
+    `assert(Int16MCP.X, 32'h00007FFF);
+
+    // 7FFF x 1 = 7FFF
+    // 7FFF x 0001 = 0000 7FFF
+    `testop(8'h7F, 8'hFF, 8'h00, 8'h01, OP_sInt16_MULT);
+    `assert(Int16MCP.X, 32'h00007FFF);
+
     // 1 * -1 = -1
     // 0001 x FFFF = FFFF FFFF
     `testop(8'h00, 8'h01, 8'hFF, 8'hFF, OP_sInt16_MULT);
     `assert(Int16MCP.X, 32'hFFFFFFFF);
 
+    // 16 * 16 = 256
+    // 0010 x 0010 = 0000 0100
+    `testop(8'h00, 8'h10, 8'h00, 8'h10, OP_sInt16_MULT);
+    `assert(Int16MCP.X, 32'h00000100);
+
     // -16 * -1 = 16
     // FFF0 x FFFF = 0000 0010
     `testop(8'hFF, 8'hF0, 8'hFF, 8'hFF, OP_sInt16_MULT);
     `assert(Int16MCP.X, 32'h00000010);
+
+
+
+
 /*
     // FFFF + FFFF = FFFE
     // -1 + -1 = -2
@@ -148,10 +195,14 @@ initial begin
     `testop(8'hFD, 8'h00, 8'hFF, 8'h00, OP_sInt16_DIVMOD);
     `assert(Int16MCP.X, 32'h00030000);
 
+
+
+
     // 3 // 2 = 1.5 op 4 divFract
     // 0003 / 0002 = 0001 0001
     `testop(8'h00, 8'h03, 8'h00, 8'h02, OP_sInt16_DIVFRACT);
     `assert(Int16MCP.X, 32'h00018000);
+
 
     `testop(8'h7F, 8'hFF, 8'h00, 8'h01, OP_sInt16_DIVFRACT);
     `assert(Int16MCP.X, 32'h7FFF0000);
@@ -167,6 +218,10 @@ initial begin
     // 10 // 3 = 3.33333334
     `testop(8'h00, 8'h0A, 8'h00, 8'h03, OP_sInt16_DIVFRACT);
     `assert(Int16MCP.X, 32'h00035555);
+
+
+
+
 
     // SQRT(4) = 2
     `testop(8'h00, 8'h04, 8'h00, 8'h00, OP_sInt16_SQRT);
