@@ -18,7 +18,7 @@
     addressBus <= 3;\
     #5 writeBus <= 0; #5 writeBus <= 1; #5\
     DataBuffer <= op; \
-    addressBus <= 15; \
+    addressBus <= 4; \
     #5 writeBus <= 0; #5 writeBus <= 1; #5 DataBuffer <=  8'bzzzzzzzz;\
     #128
 
@@ -30,34 +30,44 @@ assign dataBus = DataBuffer;
 reg [2:0] addressBus = 0;
 reg readBus = 1;
 reg writeBus = 1;
-reg testLen = 0;
+
 
 localparam OP_sInt16_MULT = 0;
 localparam OP_sInt16_DIVMOD = 1;
 localparam OP_sInt16_DIVFRACT = 2;
 localparam OP_sInt16_SQRT = 3;
 
-top_v1 Int16MCP (
+
+top_v1b Int16MCP (
     clk,
-    readBus,
     writeBus,
+    readBus,
     addressBus,
     dataBus
 );
 
-top_v1b Int16LEN (
+
+top_v1a Int16LEN (
     clk,
-    readBus,
     writeBus,
+    readBus,
     addressBus,
     dataBus
 );
+
+top_v1x Int16x(
+        clk,
+        writeBus,
+        readBus,
+        addressBus,
+        dataBus
+    );
 
 always begin
     #1 clk <= ~clk;
 end
-
 initial begin
+/*
     #10
     DataBuffer <= 8'hAA;
     addressBus <= 0; // ah
@@ -75,14 +85,13 @@ initial begin
     addressBus <= 2; // bh
     #5 writeBus <= 0; #5 writeBus <= 1; #5 DataBuffer <=  8'bzzzzzzzz; // write register
     `assert(Int16MCP.B, 16'h5500);
-/*
+*//*
     #10
     DataBuffer <= 8'h00; // add
     addressBus <= 15; // operation
     #5 writeBus <= 0; #5 writeBus <= 1; #5 DataBuffer <=  8'bzzzzzzzz; // write register
     `assert(Int16MCP.X, 32'hFFAA0000);
-*/
-/*
+*//*
     #10
     addressBus <= 0; // Xh
     #5 readBus <= 0; #5// read register
@@ -150,8 +159,6 @@ initial begin
     // FFF0 x FFFF = 0000 0010
     `testop(8'hFF, 8'hF0, 8'hFF, 8'hFF, OP_sInt16_MULT);
     `assert(Int16MCP.X, 32'h00000010);
-
-
 
 
 /*
@@ -250,7 +257,6 @@ initial begin
 
 
 // test for SRQ and LEN version
-testLen <= 1;
 
     // SQR
     // SQR(0) = 0
@@ -308,6 +314,23 @@ testLen <= 1;
     // LEN(1000, 1000) = 0x3E8 , 0x3E8 = 0x586
     `testop(8'h03, 8'hE8, 8'h03, 8'hE8, 1);
     `assert(Int16LEN.X, 32'h00000586);
+
+
+
+
+// 16x16 v1x
+    `testop(8'h00, 8'h00, 8'h00, 8'h00, 0);
+    `assert(Int16x.X, 32'h00000000);
+
+    `testop(8'h00, 8'h01, 8'h00, 8'h0A, 0);
+    `assert(Int16x.X, 32'h0000000A);
+
+    `testop(8'h00, 8'hA0, 8'h00, 8'h01, 0);
+    `assert(Int16x.X, 32'h000000A0);
+
+    // SQR(0x5555) = 1C71 8E39
+    `testop(8'h55, 8'h55, 8'h55, 8'h55, 0);
+    `assert(Int16x.X, 32'h1C718E39);
 
     $finish;
 

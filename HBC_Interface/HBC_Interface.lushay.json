@@ -1,10 +1,10 @@
  {
-    "name": "TangNano1k_test",
+    "name": "HBC_Interface",
     "includedFiles": "all",
     "externalFlashFiles": [],
     "top": "top",
-    "constraintsFile": "TangNano1k_test.cst",
-    "programMode":"flash",
+    "constraintsFile": "HBC_Interface.cst",
+    "programMode":"ram",
     "testBenches": "all",
     "nextPnrGowinOptions": [],
     "synthGowinOptions": [],
