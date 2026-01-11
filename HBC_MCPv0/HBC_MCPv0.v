@@ -32,8 +32,8 @@ module top (
 
 // interface
 reg [7:0] dataBufferIn[5];
-wire [7:0] dataBufferOut[4];
-assign data = !RDn ? dataBufferOut[address] : 8'bZ; // tri-state
+reg [7:0] dataBufferOut[5];
+assign data = (RDn == 1'b0) ? dataBufferOut[address] : 8'bZ; // tri-state
 always @(negedge WRn) dataBufferIn[address] <= data;
 
 // math
@@ -41,12 +41,11 @@ wire signed [15:0] A = { dataBufferIn[0], dataBufferIn[1] };
 wire signed [15:0] B = { dataBufferIn[2], dataBufferIn[3] };
 wire signed [31:0] Y = A * B;
 
-assign dataBufferOut[0] = Y[31:24];
-assign dataBufferOut[1] = Y[23:16];
-assign dataBufferOut[2] = Y[15:8];
-assign dataBufferOut[3] = Y[7:0];
-
-always @(posedge clk) begin
-   //
+always @(posedge WRn) begin
+    dataBufferOut[0] <= Y[31:24];
+    dataBufferOut[1] <= Y[23:16];
+    dataBufferOut[2] <= Y[15:8];
+    dataBufferOut[3] <= Y[7:0];
+    dataBufferOut[4] <= 8'hAA;
 end
 endmodule

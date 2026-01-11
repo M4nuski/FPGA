@@ -2,7 +2,7 @@
 // 8 bit parallel interface
 // M4nusky DEC-2025
 
-// v1, Mult, Div (mod), Div (fraction), Sqrt
+// v1b: Mult, Div (mod), Div (fraction), Sqrt
 
 // Tang Nano 1K
 // pass at board's default 27MHz clock
@@ -17,10 +17,10 @@ module top_v1b (
 );
 
 // interface 
-reg [7:0] dataBufferIn[0:5];
-wire [7:0] dataBufferOut[0:5];
-assign data = !RDn ? dataBufferOut[address] : 8'bZ; // tri-state
-always @(negedge WRn) dataBufferIn[address] <= data;
+reg [7:0] dataBufferIn[5];
+reg [7:0] dataBufferOut[5];
+assign data = (RDn == 1'b0) ? dataBufferOut[address] : 8'bZ; // tri-state
+always @(posedge WRn) dataBufferIn[address] <= data;
 
 // Address map
 // on write
@@ -44,7 +44,7 @@ always @(negedge WRn) dataBufferIn[address] <= data;
 // global state
 reg Status = 0; // 1: busy
 wire [1:0] Operation = dataBufferIn[4][1:0];
-reg [6:0] Seq = 0; // operation sub steps
+reg [6:0] Seq = 0; // operation sub steps 0-127
 
 // math
 wire [14:0] A = { dataBufferIn[0][6:0], dataBufferIn[1] };
@@ -57,8 +57,8 @@ wire [14:0] Bpos = (Bsign == 0) ? B : -B;
 
 reg [31:0] Ax = 0; // work register
 reg [31:0] Bx = 0; // work register
-reg [31:0] X = 0; // output register
 
+reg [31:0] X = 0; // output register
 assign dataBufferOut[0] = X[31:24];
 assign dataBufferOut[1] = X[23:16];
 assign dataBufferOut[2] = X[15:8];
@@ -66,20 +66,19 @@ assign dataBufferOut[3] = X[7:0];
 assign dataBufferOut[4] = { 7'b0, Status };
 
 // Main state machine
-always @(posedge clk) if ((WRn == 1'b0) && (address == 3'd4)) begin
-    Seq <= 6'd0; // on write to op byte, reset and save data
-    Status <= 1'b1;
-end else if (Status == 1'b1) begin
-
-    Seq <= Seq + 1;
-    // process operation
-
-    case (Operation)
+always @(posedge clk) begin
+    if ((WRn == 1'b0) && (address == 3'd4)) begin
+        Seq <= 7'd0; // on write to op byte, reset and save data
+        Status <= 1'b1;
+    end
+    else if (Status == 1'b1) begin
+        Seq <= Seq + 7'd1;
+        case (Operation)
         //mult16
         0: begin 
             if (Seq == 7'd0) begin // init
                // X <= { (A[15] ^ B[15]), 31'd0 }; // sign bit, clear
-               X <= 32'd0;
+                X <= 32'd0;
                 Bx <= { 17'd0, Bpos }; // clear and copy except sign
                 Ax[14:0] <= Apos; // copy except sign
             end else if (Seq <= 7'd16) begin 
@@ -88,7 +87,7 @@ end else if (Status == 1'b1) begin
                 Bx <= Bx << 1;
             end else begin
                 Status <= 0; // not busy
-                if (Xsign) X[31:0] <= { 1'b1, -X[30:0] }; // re-adjust sign
+            //    if (Xsign) X[31:0] <= { 1'b1, -X[30:0] }; // re-adjust sign
             end
         end // end mult16 op
 
@@ -141,7 +140,7 @@ end else if (Status == 1'b1) begin
                     end else Bx <= Bx >> 1;
                 end
             end else begin //32 sign and finalize
-                if (Xsign) X[31:0] <= { 1'b1, -X[30:0] };
+            //    if (Xsign) X[31:0] <= { 1'b1, -X[30:0] };
                 Status <= 0;
             end
         end // end divfract16
@@ -171,6 +170,7 @@ end else if (Status == 1'b1) begin
         end // end sqrt16.8
 
     endcase // end case operation
+    end
 end // end clk 
 
 endmodule

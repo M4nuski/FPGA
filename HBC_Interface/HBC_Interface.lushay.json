@@ -4,7 +4,7 @@
     "externalFlashFiles": [],
     "top": "top",
     "constraintsFile": "HBC_Interface.cst",
-    "programMode":"ram",
+    "programMode":"flash",
     "testBenches": "all",
     "nextPnrGowinOptions": [],
     "synthGowinOptions": [],

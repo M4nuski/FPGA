@@ -2,7 +2,7 @@
 // 8 bit parallel interface
 // M4nusky JAN-2026
 
-// v1a, Sqr, Length
+// v1a: Sqr, Length
 
 // Tang Nano 1K
 // pass at board's default 27MHz clock
@@ -17,10 +17,10 @@ module top_v1a (
 );
 
 // interface
-reg [7:0] dataBufferIn[0:5];
-wire [7:0] dataBufferOut[0:5];
-assign data = !RDn ? dataBufferOut[address] : 8'bZ; // tri-state
-always @(negedge WRn) dataBufferIn[address] <= data;
+reg [7:0] dataBufferIn[5];
+reg [7:0] dataBufferOut[6];
+assign data = (RDn == 1'b0) ? dataBufferOut[address] : 8'bZ; // tri-state
+always @(posedge WRn) dataBufferIn[address] <= data;
 
 // Address map
 // on write
@@ -38,7 +38,8 @@ always @(negedge WRn) dataBufferIn[address] <= data;
 //  1: Xl (Q.B)         Lenl
 //  2: Yh (Q.C) 
 //  3: Yl (Q.D) Sqr LSB
-//  4: Busy
+//  4: Busy:Operation
+//  5: Random byte
 
 // global state
 reg Status = 0;
@@ -56,25 +57,30 @@ wire [14:0] Bpos = (Bsign == 0) ? B : -B;
 
 reg [31:0] Ax = 0; // work register
 reg [31:0] Bx = 0; // work register
-reg [31:0] Y = 0; // work register
+reg [31:0] Y  = 0; // work register
 
-reg [31:0] X = 0; // output register
+reg [31:0] X = 32'hDEADBEEF; // output register
 assign dataBufferOut[0] = X[31:24];
 assign dataBufferOut[1] = X[23:16];
 assign dataBufferOut[2] = X[15:8];
 assign dataBufferOut[3] = X[7:0];
-assign dataBufferOut[4] = { 7'b0, Status };
+assign dataBufferOut[4] = { 3'b0, Status, 3'b0, Operation };
+
+wire randomBit;
+lfsr #() randomGen (clk, randomBit);
 
 
 // Main state machine
-always @(posedge clk) if ((WRn == 1'b0) && (address == 3'd4)) begin
-    Seq <= 6'd0; // on write to op byte, reset sequence and set status
-    Status <= 1'b1;
-end else if (Status == 1'b1) begin
-
-    Seq <= Seq + 6'd1;
-
-    case (Operation)
+always @(posedge clk) begin
+    if ((WRn == 1'b0) && (address == 3'd4)) begin
+        Seq <= 6'd0; // on write to op byte, reset sequence and set status
+        Status <= 1'b1;
+    end
+//    X <= Apos + Bpos; // for interface test
+//end
+    else if (Status == 1'b1) begin
+        Seq <= Seq + 6'd1;
+        case (Operation)
         //sqr16
         0: begin
                 if (Seq == 6'd0) begin // init
@@ -120,8 +126,9 @@ end else if (Status == 1'b1) begin
                 end
             end // end sqrt reduce
         end // end len16
+        endcase // end case operation
+    end // end status == 1
 
-    endcase // end case operation
-end // end clk 
-
+    dataBufferOut[5] <= { dataBufferOut[5][6:0], randomBit };
+end // end clk
 endmodule

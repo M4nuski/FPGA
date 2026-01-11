@@ -7,7 +7,7 @@
 // Tang Nano 1K
 // pass at board's default 27MHz clock
 // yosys need -nowidelut
-
+/*
 module top_v1x (
     input clk,
     input WRn,
@@ -93,7 +93,7 @@ assign    Y = B0;// + B1 + B2 + B3 + B4 + B5 + B6 + B7 + B8 + B9 + B10 + B11 + B
     
    // Y = AA * BB;
 //end;
-
+/*
 wire signed [15:0] A = { dataBufferIn[0], dataBufferIn[1] }; // input register A
 wire signed [15:0] B = { dataBufferIn[2], dataBufferIn[3] }; // input register B
 wire signed [31:0] X = A * B;

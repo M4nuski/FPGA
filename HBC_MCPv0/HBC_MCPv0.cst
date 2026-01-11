@@ -1,11 +1,11 @@
 IO_LOC  "address[2]" 20;
-IO_PORT "address[2]" IO_TYPE=LVCMOS33;
+IO_PORT "address[2]" IO_TYPE=LVCMOS33 PULL_MODE=DOWN;
 
 IO_LOC  "address[1]" 19;
-IO_PORT "address[1]" IO_TYPE=LVCMOS33;
+IO_PORT "address[1]" IO_TYPE=LVCMOS33 PULL_MODE=DOWN;
 
 IO_LOC  "address[0]" 29;
-IO_PORT "address[0]" IO_TYPE=LVCMOS33;
+IO_PORT "address[0]" IO_TYPE=LVCMOS33 PULL_MODE=DOWN;
 
 IO_LOC  "data[0]" 23;
 IO_PORT "data[0]" DRIVE=12 IO_TYPE=LVCMOS33;
