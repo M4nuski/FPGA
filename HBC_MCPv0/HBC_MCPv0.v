@@ -34,14 +34,14 @@ module top (
 reg [7:0] dataBufferIn[5];
 reg [7:0] dataBufferOut[5];
 assign data = (RDn == 1'b0) ? dataBufferOut[address] : 8'bZ; // tri-state
-always @(negedge WRn) dataBufferIn[address] <= data;
+always @(posedge WRn) dataBufferIn[address] <= data;
 
 // math
 wire signed [15:0] A = { dataBufferIn[0], dataBufferIn[1] };
 wire signed [15:0] B = { dataBufferIn[2], dataBufferIn[3] };
 wire signed [31:0] Y = A * B;
 
-always @(posedge WRn) begin
+always @(negedge RDn) begin
     dataBufferOut[0] <= Y[31:24];
     dataBufferOut[1] <= Y[23:16];
     dataBufferOut[2] <= Y[15:8];

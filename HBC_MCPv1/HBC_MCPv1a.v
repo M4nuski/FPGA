@@ -38,7 +38,7 @@ always @(posedge WRn) dataBufferIn[address] <= data;
 //  1: Xl (Q.B)         Lenl
 //  2: Yh (Q.C) 
 //  3: Yl (Q.D) Sqr LSB
-//  4: Busy:Operation
+//  4: [0, 0, 0, Busy,  0, 0, 0, Operation]
 //  5: Random byte
 
 // global state
@@ -66,19 +66,28 @@ assign dataBufferOut[2] = X[15:8];
 assign dataBufferOut[3] = X[7:0];
 assign dataBufferOut[4] = { 3'b0, Status, 3'b0, Operation };
 
+//PRNG
 wire randomBit;
 lfsr #() randomGen (clk, randomBit);
+always @(posedge clk) dataBufferOut[5] <= { dataBufferOut[5][6:0], randomBit };
 
-
+localparam START_DELAY = 10;
+reg [3:0] oldWRn = 0;
 // Main state machine
 always @(posedge clk) begin
-    if ((WRn == 1'b0) && (address == 3'd4)) begin
-        Seq <= 6'd0; // on write to op byte, reset sequence and set status
-        Status <= 1'b1;
-    end
 //    X <= Apos + Bpos; // for interface test
-//end
-    else if (Status == 1'b1) begin
+    if ((WRn == 1'b0) & (address == 3'd4)) oldWRn <= 0;
+    if ((WRn == 1'b1) & (oldWRn < START_DELAY)) oldWRn <= oldWRn + 4'b1;
+
+   if ((oldWRn == START_DELAY) & (Status == 1'b0)) begin
+    oldWRn <= START_DELAY + 1;
+   //if (oldWRn == 4'b10) begin
+       // dataBufferIn[address] <= data;
+       // if (address == 3'd4) begin
+            Seq <= 6'd0; // on write to op byte, reset sequence and set status
+            Status <= 1'b1;
+      //  end 
+    end else if (Status == 1'b1) begin
         Seq <= Seq + 6'd1;
         case (Operation)
         //sqr16
@@ -128,7 +137,5 @@ always @(posedge clk) begin
         end // end len16
         endcase // end case operation
     end // end status == 1
-
-    dataBufferOut[5] <= { dataBufferOut[5][6:0], randomBit };
 end // end clk
 endmodule

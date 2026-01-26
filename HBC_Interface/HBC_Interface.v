@@ -10,7 +10,7 @@ module top (
 
 reg [7:0] dataBuffer = 8'hAA;
 assign data = (RDn == 1'b0) ? dataBuffer : 8'bZ; // tri-state
-always @(negedge WRn) dataBuffer <= data;
+always @(posedge WRn) dataBuffer <= data;
 
 always @(posedge clk) begin
     //
@@ -29,7 +29,7 @@ module top (
 
 reg [7:0] dataBuffer[8];
 assign data = (RDn == 1'b0) ? dataBuffer[address] : 8'bZ; // tri-state
-always @(negedge WRn) dataBuffer[address] <= data;
+always @(posedge WRn) dataBuffer[address] <= data; // posedge because of slow set time of data lines vs Enable
 
 always @(posedge clk) begin
     // 
@@ -48,7 +48,7 @@ endmodule
 
 reg [7:0] dataBuffer[4];
 assign data = (!RDn && !CSn) ? dataBuffer[address] : 8'bZ; // tri-state
-always @(negedge (WRn || CSn)) dataBuffer[address] <= data;
+always @(posedge (WRn || CSn)) dataBuffer[address] <= data;
 
 
 always @(posedge clk) begin
