@@ -46,6 +46,6 @@ always @(negedge RDn) begin
     dataBufferOut[1] <= Y[23:16];
     dataBufferOut[2] <= Y[15:8];
     dataBufferOut[3] <= Y[7:0];
-    dataBufferOut[4] <= 8'hAA;
+    dataBufferOut[4] <= dataBufferIn[4];
 end
 endmodule

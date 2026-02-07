@@ -18,7 +18,7 @@ module top_v1b (
 
 // interface 
 reg [7:0] dataBufferIn[5];
-reg [7:0] dataBufferOut[5];
+wire [7:0] dataBufferOut[5];
 assign data = (RDn == 1'b0) ? dataBufferOut[address] : 8'bZ; // tri-state
 always @(posedge WRn) dataBufferIn[address] <= data;
 
@@ -28,7 +28,7 @@ always @(posedge WRn) dataBufferIn[address] <= data;
 //  1: Al (D.B)
 //  2: Bh (D.A)
 //  3: Bl (D.B)
-//  7: Operation
+//  4: Operation
 //      0: Mult 16x16 to 32 bit             XY = A * B   (20 clocks)
 //      1: Div and Modulus                  X = A / B, Y = A % B    (33 clocks)
 //      2: Div with 16 bit fractional part  X.Y = A / B (X: int part, Y: fract part)  (65 clocks)
@@ -39,7 +39,7 @@ always @(posedge WRn) dataBufferIn[address] <= data;
 //  1: Xl (Q.B)          Div l, Div l,       Sqrt l
 //  2: Yh (Q.C)          Mod h, Div fract h, Sqrt fract
 //  3: Yl (Q.D) Mul LSB, Mod l, Div fract l
-//  7: Busy
+//  4: [0, 0, 0, Busy,  0, 0, Operation]
 
 // global state
 reg Status = 0; // 1: busy
@@ -56,22 +56,23 @@ wire [14:0] Apos = (Asign == 0) ? A : -A;
 wire [14:0] Bpos = (Bsign == 0) ? B : -B;
 
 reg [31:0] Ax = 0; // work register
-reg [31:0] Bx = 0; // work register
+reg [32:0] Bx = 0; // work register
 
 reg [31:0] X = 0; // output register
 assign dataBufferOut[0] = X[31:24];
 assign dataBufferOut[1] = X[23:16];
 assign dataBufferOut[2] = X[15:8];
 assign dataBufferOut[3] = X[7:0];
-assign dataBufferOut[4] = { 7'b0, Status };
+assign dataBufferOut[4] = { 3'b0, Status, 2'b0, Operation };
 
+reg WRn_prev = 0;
 // Main state machine
 always @(posedge clk) begin
-    if ((WRn == 1'b0) && (address == 3'd4)) begin
-        Seq <= 7'd0; // on write to op byte, reset and save data
+    WRn_prev <= WRn;
+    if ((WRn == 1'b1) & (WRn_prev == 1'b0) & (address == 3'd4)) begin
+        Seq <= 7'd0; // on write to op byte, reset sequence and set status
         Status <= 1'b1;
-    end
-    else if (Status == 1'b1) begin
+    end else if (Status == 1'b1) begin
         Seq <= Seq + 7'd1;
         case (Operation)
         //mult16
@@ -79,7 +80,7 @@ always @(posedge clk) begin
             if (Seq == 7'd0) begin // init
                // X <= { (A[15] ^ B[15]), 31'd0 }; // sign bit, clear
                 X <= 32'd0;
-                Bx <= { 17'd0, Bpos }; // clear and copy except sign
+                Bx <= { 18'd0, Bpos }; // clear and copy except sign
                 Ax[14:0] <= Apos; // copy except sign
             end else if (Seq <= 7'd16) begin 
                 if (Ax[0] == 1'b1) X <= X + Bx;
@@ -87,7 +88,7 @@ always @(posedge clk) begin
                 Bx <= Bx << 1;
             end else begin
                 Status <= 0; // not busy
-            //    if (Xsign) X[31:0] <= { 1'b1, -X[30:0] }; // re-adjust sign
+                if (Xsign) X[31:0] <= { 1'b1, -X[30:0] }; // re-adjust sign
             end
         end // end mult16 op
 
@@ -97,7 +98,7 @@ always @(posedge clk) begin
                 //X <= { (A[15] ^ B[15]), 31'd0 }; // sign bit, clear
                 X <= 32'd0;
                 Ax <= { 17'd0, Apos }; // copy positive part
-                Bx <= { 3'd0, Bpos, 14'd0 }; // copy positive part
+                Bx <= { 4'd0, Bpos, 14'd0 }; // copy positive part
             end else if (Seq <= 7'd30) begin // calc
                 if (Seq[0] == 1'd1) begin // odd step
                     if (Bx <= Ax) begin
@@ -125,7 +126,7 @@ always @(posedge clk) begin
                 //X <= { Xsign, 31'd0 }; // sign bit, clear
                 X <= 32'd0;
                 Ax <= { 17'd0, Apos }; // copy positive part
-                Bx <= { 3'd0, Bpos, 14'd0 }; // copy positive part
+                Bx <= { 4'd0, Bpos, 14'd0 }; // copy positive part
             end else if (Seq <= 7'd62) begin // calc
                 if (Seq[0] == 1'd1) begin // odd step
                     if (Bx <= Ax) begin
@@ -149,11 +150,11 @@ always @(posedge clk) begin
         3: begin
             if (Seq == 7'd0) begin //0 init
                 Ax <= { 1'd0, Apos, 16'd0 }; // target, shifted by 16 bits to allow fractional part
-                X <= 32'd0; // clear result
-                Bx <= 32'h40000000; // initial guess
+                X <= 32'd08; // clear result
+                Bx <= 33'h100000000; // initial guess
             end else if (Seq <= 7'd34) begin //1-34 reduce
                 if (Seq[0] == 1'd1) begin // odd step
-                    if (Bx == 32'd0) begin
+                    if (Bx == 33'd0) begin
                         Seq <= 7'd35;
                     end else if (Ax >= (X + Bx)) begin
                         Ax <= Ax - (X + Bx);
@@ -169,7 +170,7 @@ always @(posedge clk) begin
             end
         end // end sqrt16.8
 
-    endcase // end case operation
+        endcase // end case operation
     end
 end // end clk 
 

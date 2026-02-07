@@ -4,7 +4,7 @@
     "externalFlashFiles": [],
     "top": "top",
     "constraintsFile": "HBC_MCPv0.cst",
-    "programMode":"ram",
+    "programMode":"flash",
     "testBenches": "all",
     "nextPnrGowinOptions": ["--placer-heap-cell-placement-timeout=4", "--randomize-seed"],
     "synthGowinOptions": ["-nowidelut"],

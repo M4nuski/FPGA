@@ -1,3 +1,7 @@
+`define Test_v1a 1;
+//`define Test_v1b 1;
+//`define Test_v1x 1;
+
 `define assert(signal, value) \
         if (signal !== value) begin \
             $display("ASSERTION FAILED line %0d expected: value, returned: 32'h%0000h", `__LINE__, signal); \
@@ -37,7 +41,7 @@ localparam OP_sInt16_DIVMOD = 1;
 localparam OP_sInt16_DIVFRACT = 2;
 localparam OP_sInt16_SQRT = 3;
 
-
+`ifdef Test_v1b
 top_v1b Int16MCP (
     clk,
     writeBus,
@@ -45,8 +49,9 @@ top_v1b Int16MCP (
     addressBus,
     dataBus
 );
+`endif
 
-
+`ifdef Test_v1a
 top_v1a Int16LEN (
     clk,
     writeBus,
@@ -54,7 +59,9 @@ top_v1a Int16LEN (
     addressBus,
     dataBus
 );
+`endif
 
+`ifdef Test_v1x
 top_v1x Int16x(
         clk,
         writeBus,
@@ -62,11 +69,14 @@ top_v1x Int16x(
         addressBus,
         dataBus
     );
+`endif
 
 always begin
     #1 clk <= ~clk;
 end
 initial begin
+
+`ifdef Test_v1b
 /*
     #10
     DataBuffer <= 8'hAA;
@@ -255,8 +265,10 @@ initial begin
     `testop(8'h7F, 8'hFF, 8'h00, 8'h00, OP_sInt16_SQRT);
     `assert(Int16MCP.X, 32'h00B50400);
 
-
+`endif
 // test for SRQ and LEN version
+`ifdef Test_v1a
+repeat (256) begin
 
     // SQR
     // SQR(0) = 0
@@ -315,9 +327,14 @@ initial begin
     `testop(8'h03, 8'hE8, 8'h03, 8'hE8, 1);
     `assert(Int16LEN.X, 32'h00000586);
 
+    // LEN(32767, 32767) = 46,339.5,  0x7FFF , 0x7FFF = 0x586
+    `testop(8'h7F, 8'hFF, 8'h7F, 8'hFF, 1);
+    `assert(Int16LEN.X, 32'h0000B503);
 
+        end
+`endif
 
-
+`ifdef Test_v1x
 // 16x16 v1x
     `testop(8'h00, 8'h00, 8'h00, 8'h00, 0);
     `assert(Int16x.X, 32'h00000000);
@@ -331,7 +348,7 @@ initial begin
     // SQR(0x5555) = 1C71 8E39
     `testop(8'h55, 8'h55, 8'h55, 8'h55, 0);
     `assert(Int16x.X, 32'h1C718E39);
-
+`endif
     $finish;
 
 end
