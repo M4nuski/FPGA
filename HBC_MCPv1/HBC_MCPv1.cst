@@ -1,6 +1,3 @@
-IO_LOC  "debug" 34;
-IO_PORT "debug" DRIVE=16 IO_TYPE=LVCMOS33;
-
 IO_LOC  "address[2]" 20;
 IO_PORT "address[2]" IO_TYPE=LVCMOS33 PULL_MODE=DOWN;
 

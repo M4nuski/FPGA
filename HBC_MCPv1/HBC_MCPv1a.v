@@ -9,7 +9,6 @@
 // yosys need -nowidelut
 
 module top_v1a (
-    output debug,
     input clk,
     input WRn,
     input RDn,
@@ -74,23 +73,21 @@ wire randomBit;
 reg [7:0] randomByte = 0; // 8
 lfsr #() randomGen (clk, randomBit);
 always @(posedge clk) randomByte <= { randomByte[6:0], randomBit };
-//assign debug = Status;
+assign debug = Status;
 assign dataBufferOut[5] = randomByte;
 // 7FFF sqr
-// max is 0011 1111  1111 1111  0000 0000  0000 0001
-// A+B    0111 1111  1111 1110  0000 0000  0000 0010
+// sqr is 0011 1111  1111 1111  0000 0000  0000 0001
+// A+B is 0111 1111  1111 1110  0000 0000  0000 0010
 //        0100 sqrt initial not enough
 //      1 0000 sqrt max is 33 bits long
-reg [3:0] WRn_prev = 0;
+reg [2:0] WRn_prev = 0;
 // Main state machine
 always @(posedge clk) begin
-   WRn_prev <= { WRn_prev[2:0], WRn };
-   if ((WRn_prev == 4'b0111) & (addressBuffer == 3'd4) & (Status == 1'b0)) begin
-        Seq <= 6'd0; // on write to op byte, reset sequence and set status
+   WRn_prev <= { WRn_prev[1:0], WRn };
+   if ((WRn_prev == 3'b011) & (addressBuffer == 3'd4) & (Status == 1'b0)) begin
+        Seq <= 6'd0;
         Status <= 1'b1;
-        debug <= 1;
     end else if (Status == 1'b1) begin
-        debug <= 0;
         Seq <= Seq + 6'd1;
         case (Operation)
         //sqr16
