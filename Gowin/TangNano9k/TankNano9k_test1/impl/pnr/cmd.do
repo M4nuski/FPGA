@@ -1,0 +1,17 @@
+-d C:\OneDrive\PRog\FPGA\TankNano9k_test1\impl\gwsynthesis\TankNano9k_test1.vg
+-p GW1NR-9C-QFN88P-6
+-pn GW1NR-LV9QN88PC6/I5
+-cst C:\OneDrive\PRog\FPGA\TankNano9k_test1\src\test.cst
+-cfg C:\OneDrive\PRog\FPGA\TankNano9k_test1\impl\pnr\device.cfg
+-bit
+-tr
+-ph
+-timing
+-cst_error
+-convert_sdp32_36_to_sdp16_18
+-place_option 0
+-route_option 0
+-clock_route_order 0
+-correct_hold 1
+-route_maxfan 23
+-global_freq 27.000

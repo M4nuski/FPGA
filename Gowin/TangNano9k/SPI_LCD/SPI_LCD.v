@@ -77,6 +77,7 @@ module top
 
     flashReader #() pixGen (
         clk,
+	
         flash_clk,
         flash_miso,
         flash_mosi,

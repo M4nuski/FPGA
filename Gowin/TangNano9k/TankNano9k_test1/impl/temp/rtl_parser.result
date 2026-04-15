@@ -1,0 +1,34 @@
+[
+ {
+  "InstFile" : "C:/OneDrive/Prog/FPGA/Gowin/TangNano9k/TankNano9k_test1/src/gowin_dpb/gowin_dpb.v",
+  "InstLine" : 10,
+  "InstName" : "Gowin_DPB",
+  "ModuleFile" : "C:/OneDrive/Prog/FPGA/Gowin/TangNano9k/TankNano9k_test1/src/gowin_dpb/gowin_dpb.v",
+  "ModuleLine" : 10,
+  "ModuleName" : "Gowin_DPB"
+ },
+ {
+  "InstFile" : "C:/OneDrive/Prog/FPGA/Gowin/TangNano9k/TankNano9k_test1/src/gowin_prom/gowin_prom.v",
+  "InstLine" : 10,
+  "InstName" : "Gowin_pROM",
+  "ModuleFile" : "C:/OneDrive/Prog/FPGA/Gowin/TangNano9k/TankNano9k_test1/src/gowin_prom/gowin_prom.v",
+  "ModuleLine" : 10,
+  "ModuleName" : "Gowin_pROM"
+ },
+ {
+  "InstFile" : "C:/OneDrive/Prog/FPGA/Gowin/TangNano9k/TankNano9k_test1/src/gowin_sdpb/gowin_sdpb.v",
+  "InstLine" : 10,
+  "InstName" : "Gowin_SDPB",
+  "ModuleFile" : "C:/OneDrive/Prog/FPGA/Gowin/TangNano9k/TankNano9k_test1/src/gowin_sdpb/gowin_sdpb.v",
+  "ModuleLine" : 10,
+  "ModuleName" : "Gowin_SDPB"
+ },
+ {
+  "InstFile" : "C:/OneDrive/Prog/FPGA/Gowin/TangNano9k/TankNano9k_test1/src/test.v",
+  "InstLine" : 1,
+  "InstName" : "top",
+  "ModuleFile" : "C:/OneDrive/Prog/FPGA/Gowin/TangNano9k/TankNano9k_test1/src/test.v",
+  "ModuleLine" : 1,
+  "ModuleName" : "top"
+ }
+]

@@ -1,0 +1,14 @@
+ {
+    "name": "PLL",
+    "includedFiles": "all",
+    "externalFlashFiles": [],
+    "top": "top",
+    "constraintsFile": "PLL_1.cst",
+    "programMode":"flash",
+    "testBenches": "all",
+    "nextPnrGowinOptions": [],
+    "synthGowinOptions": [],
+    "baudRate": 115200,
+    "board": "tangnano9k",
+    "skipCstChecking": false
+}

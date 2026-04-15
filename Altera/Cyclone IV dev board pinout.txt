@@ -1,0 +1,43 @@
+clk50 PIN_24, PIN_25
+clk25 PIN_90, PIN_91
+btn0 PIN_73
+btn1 PIN_80
+btnReset PIN_88
+btn2 PIN_89
+btn3 PIN_114
+tx PIN_10
+rx PIN_23
+led0 PIN_11
+led1 PIN_7
+led2 PIN_3
+led3 PIN_2
+led4 PIN_1
+
+EPCS4N Flash FPGA programmer 4Mbit ActiveSerial
+DCLK	PIN_12	DCLK
+ASDI	PIN_6	ASDO
+nCS	PIN_21
+DATA	PIN_13	DATA0 33 ohm in serie
+
+25Q64FVSIQ Winbond 3V 64M-BIT SERIAL FLASH MEMORY WITH DUAL/QUAD SPI & QPI
+#cs	PIN_87
+do/io1	PIN_84
+#wp/io2		vcc
+#hold/io3	vcc
+clk	PIN_75
+di/io0	PIN_74
+
+CH340C USB 
+
+nSTATUS	PIN_9	10k pullup to 3.3V
+nConfig PIN_14	10k pullup to 3.3V
+TDI	PIN_15	JTAG
+TCK	PIN_16	JTAG
+TMS	PIN_18	JTAG
+TDO	PIN_20	JTAG
+nCE	PIN_21	EPCS4 pin 1
+CONF_DONE	PIN_92
+MSEL0	PIN_94	10k pullup to 3.3V
+MSEL1	PIN_96	3.3V
+MSEL2	PIN_97	GND
+

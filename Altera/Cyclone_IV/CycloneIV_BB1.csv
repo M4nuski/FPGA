@@ -1,0 +1,39 @@
+# Copyright (C) 1991-2013 Altera Corporation
+# Your use of Altera Corporation's design tools, logic functions 
+# and other software and tools, and its AMPP partner logic 
+# functions, and any output files from any of the foregoing 
+# (including device programming or simulation files), and any 
+# associated documentation or information are expressly subject 
+# to the terms and conditions of the Altera Program License 
+# Subscription Agreement, Altera MegaCore Function License 
+# Agreement, or other applicable license agreement, including, 
+# without limitation, that your use is for the sole purpose of 
+# programming logic devices manufactured by Altera and sold by 
+# Altera or its authorized distributors.  Please refer to the 
+# applicable agreement for further details.
+
+# Quartus II 64-Bit Version 13.0.1 Build 232 06/12/2013 Service Pack 1 SJ Web Edition
+# File: C:\altera_projects\CycloneIV_BB1.csv
+# Generated on: Sat Mar 14 14:48:51 2026
+
+# Note: The column header names should not be changed if you wish to import this .csv file into the Quartus II software.
+
+To,Direction,Location,I/O Bank,VREF Group,Fitter Location,I/O Standard,Reserved,Current Strength,Slew Rate,Differential Pair
+a,Input,PIN_38,3,B3_N0,PIN_38,,,,,
+b,Input,PIN_39,3,B3_N0,PIN_39,,,,,
+y,Output,PIN_71,4,B4_N0,PIN_71,,,,,
+clk50_a,Unknown,PIN_24,2,B2_N0,,,,,,
+clk50_b,Unknown,PIN_25,2,B2_N0,,,,,,
+clk25_a,Unknown,PIN_90,6,B6_N0,,,,,,
+clk25_b,Unknown,PIN_91,6,B6_N0,,,,,,
+btn0,Unknown,PIN_73,5,B5_N0,,,,,,
+btn1,Unknown,PIN_80,5,B5_N0,,,,,,
+btn2,Unknown,PIN_89,5,B5_N0,,,,,,
+btn3,Unknown,PIN_114,7,B7_N0,,,,,,
+tx,Unknown,PIN_10,1,B1_N0,,,,,,
+rx,Unknown,PIN_23,1,B1_N0,,,,,,
+led0,Unknown,PIN_1,1,B1_N0,,,,,,
+led1,Unknown,PIN_2,1,B1_N0,,,,,,
+led2,Unknown,PIN_3,1,B1_N0,,,,,,
+led3,Unknown,PIN_7,1,B1_N0,,,,,,
+led4,Unknown,PIN_11,1,B1_N0,,,,,,

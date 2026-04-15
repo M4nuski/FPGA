@@ -3,5 +3,13 @@
 *.json
 !*lushay.json
 *.vcd
-
-
+*.v.bak
+**/.qsys_edit/
+**/atom_netlists/
+**/db/
+**/greybox_tmp/
+**/incremental_db/
+**/ip/
+**/output_files/
+**/simulation/
+**/.Github-examples/

@@ -12,15 +12,15 @@ module top_v1x (
     input clk,
     input WRn,
     input RDn,
-    input [2:0] address,
+    input [1:0] address,
     inout wire [7:0] data
 );
 
 // interface 
-reg [7:0] dataBufferIn[0:5];
-wire [7:0] dataBufferOut[0:5];
+reg [7:0] dataBufferIn[4];
+wire [7:0] dataBufferOut[4];
 assign data = !RDn ? dataBufferOut[address] : 8'bZ; // tri-state
-always @(negedge WRn) dataBufferIn[address] <= data;
+always @(posedge WRn) dataBufferIn[address] <= data;
 
 // Address map
 // on write

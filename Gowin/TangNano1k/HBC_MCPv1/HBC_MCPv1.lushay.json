@@ -1,8 +1,8 @@
  {
     "name": "HBC_MCPv1",
-    "includedFiles": ["HBC_MCPv1a.v", "lfsr.v"],
+    "includedFiles": ["HBC_MCPv1x.v", "lfsr.v"],
     "externalFlashFiles": [],
-    "top": "top_v1a",
+    "top": "top_v1x",
     "constraintsFile": "HBC_MCPv1.cst",
     "programMode":"flash",
     "testBenches": "all",
