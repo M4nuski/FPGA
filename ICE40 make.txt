@@ -1,0 +1,3 @@
+yosys -p "read_verilog Port_counter.v; synth_ice40 -top top -json Port_counter.synth.json"
+nextpnr-ice40 --json Port_counter.synth.json --asc Port_counter.asc --lp384 --package qn32 --pcf Port_counter.pcf
+icepack -v Port_counter.asc Port_counter.bin

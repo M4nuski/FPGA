@@ -1,0 +1,35 @@
+Info: Starting: Create block symbol file (.bsf)
+Info: qsys-generate C:\OneDrive\PRog\FPGA\Altera\Cyclone_IV\sfl.qsys --block-symbol-file --output-directory=C:\OneDrive\PRog\FPGA\Altera\Cyclone_IV\sfl --family="Cyclone IV E" --part=EP4CE6E22C8
+Progress: Loading Cyclone_IV/sfl.qsys
+Progress: Reading input file
+Progress: Adding serial_flash_loader_0 [altera_serial_flash_loader 25.1]
+Progress: Parameterizing module serial_flash_loader_0
+Progress: Building connections
+Progress: Parameterizing connections
+Progress: Validating
+Progress: Done reading input file
+Info: qsys-generate succeeded.
+Info: Finished: Create block symbol file (.bsf)
+Info: 
+Info: Starting: Create HDL design files for synthesis
+Info: qsys-generate C:\OneDrive\PRog\FPGA\Altera\Cyclone_IV\sfl.qsys --synthesis=VERILOG --greybox --output-directory=C:\OneDrive\PRog\FPGA\Altera\Cyclone_IV\sfl\synthesis --family="Cyclone IV E" --part=EP4CE6E22C8
+Progress: Loading Cyclone_IV/sfl.qsys
+Progress: Reading input file
+Progress: Adding serial_flash_loader_0 [altera_serial_flash_loader 25.1]
+Progress: Parameterizing module serial_flash_loader_0
+Progress: Building connections
+Progress: Parameterizing connections
+Progress: Validating
+Progress: Done reading input file
+Info: sfl: Generating "sfl" for QUARTUS_SYNTH
+Info: serial_flash_loader_0: generating top-level entity altera_serial_flash_loader
+Info: altclkctrl_inst: "Generating: altclkctrl_inst"
+Info: serial_flash_loader_0: "sfl" instantiated altera_serial_flash_loader "serial_flash_loader_0"
+Info: altclkctrl_inst: "serial_flash_loader_0" instantiated altera_serial_flash_loader "altclkctrl_inst"
+Info: altclkctrl_inst: Generating top-level entity sfl_serial_flash_loader_0_altclkctrl_inst_altclkctrl_inst.
+Info: altclkctrl_inst: "altclkctrl_inst" instantiated altclkctrl "altclkctrl_inst"
+Info: sfl: Done "sfl" with 4 modules, 4 files
+Info: Generating third-party timing and resource estimation model ...
+Info: Done generating third-party timing and resource estimation model.
+Info: qsys-generate succeeded.
+Info: Finished: Create HDL design files for synthesis
