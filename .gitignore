@@ -1,5 +1,8 @@
 *.fs
+*.bin
 *.o
+*.asc
+*.blif
 *.json
 !*lushay.json
 *.vcd

@@ -6,7 +6,7 @@ module top
     output reg [15:0] port,
 );
 
-localparam WAIT_TIME = 10000000;
+localparam WAIT_TIME = 1000;
 
 //reg [15:0] portCounter = 16'b1;
 reg [23:0] clockCounter = 0;
@@ -15,7 +15,7 @@ reg [23:0] clockCounter = 0;
 
 always @(posedge clk) begin
     if (clockCounter == WAIT_TIME) begin
-        clockCounter <= 0;
+        clockCounter <= 1;
         port <= port + 1; 
     end else clockCounter <= clockCounter + 1;
 end

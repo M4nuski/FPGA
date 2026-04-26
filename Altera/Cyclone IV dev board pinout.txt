@@ -30,7 +30,7 @@ di/io0	PIN_74
 CH340C USB 
 
 nSTATUS	PIN_9	10k pullup to 3.3V
-nConfig PIN_14	10k pullup to 3.3V
+nConfig PIN_14	10k pullup to 3.3V, pull down to re-config
 TDI	PIN_15	JTAG
 TCK	PIN_16	JTAG
 TMS	PIN_18	JTAG
@@ -38,7 +38,7 @@ TDO	PIN_20	JTAG
 nCE	PIN_21	EPCS4 pin 1
 CONF_DONE	PIN_92
 MSEL0	PIN_94	GND
-MSEL1	PIN_96	3.3V
+MSEL1	PIN_96	3.3V AS, standard delay, 3.3V
 MSEL2	PIN_97	GND
 
 JTAG

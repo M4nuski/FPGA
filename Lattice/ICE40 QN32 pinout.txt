@@ -40,8 +40,8 @@ VCCIO_1	VCCIO	VCCIO	17
 VCCIO_2	VCCIO	VCCIO	9
 VCCIO_3	VCCIO	VCCIO	4
 
-17 Port
-4 shared port/spi
-7 vcc
-2 gnd
-2 config
+17 ports
+4 shared ports with SPI config
+7 VCC
+2 GND
+2 Status/Config
