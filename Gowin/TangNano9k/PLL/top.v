@@ -48,11 +48,11 @@ svo_hdmi svo_hdmi_inst (
 );
 
 always @( btn2 == 1) begin
-  if (in_axis_tready == 1) begin
-    in_axis_tvalid <= 1;
-    in_axis_tdata <= 65;
+  if (in_axi_tready == 1) begin
+    in_axi_tvalid <= 1;
+    in_axi_tdata <= 65;
   end else begin
-     in_axis_tvalid <= 0;
+     in_axi_tvalid <= 0;
   end
 
 end

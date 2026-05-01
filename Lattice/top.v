@@ -30,12 +30,12 @@ SPI spi (
     SPI_MISO,
     SPI_MOSI,
 
-  //axis write to SPI interface
+  //axi write to SPI interface
     MOSI_dataAvailable,
     MOSI_readyToRead,
     MOSI_data,
 
-  //axis read from SPI interface
+  //axi read from SPI interface
     MISO_dataAvailable, // when 1 and clock posedge read the content of MISO_data
     MISO_readyToRead, // set to 1 to initiate read
     MISO_data

@@ -1,5 +1,5 @@
 // UART for TangNano
-// Axis interface
+// Axi interface
 
 `default_nettype none
 
@@ -15,13 +15,13 @@ module UART
     input clk,
 
     input uart_rx,
-    output reg axis_inData_available,
-    input axis_inData_readyToRead,
+    output reg axi_inData_available,
+    input axi_inData_readyToRead,
     output reg [7:0] inData,
 
     output reg uart_tx,
-    output reg axis_outData_readyToRead,
-    input axis_outData_available,
+    output reg axi_outData_readyToRead,
+    input axi_outData_available,
     input [7:0] outData
 );
 
@@ -43,7 +43,7 @@ module UART
     always @(posedge clk) begin
         if (!resetn) begin
             rxState <= RX_STATE_IDLE;
-            axis_inData_available <= 0;
+            axi_inData_available <= 0;
             inData <= 8'b0;
         end else case (rxState)
         RX_STATE_IDLE: begin
@@ -51,7 +51,7 @@ module UART
                 rxState <= RX_STATE_START_BIT;
                 rxCounter <= 1;
                 rxBitNumber <= 0;
-             //   axis_inData_available <= 0;
+             //   axi_inData_available <= 0;
             end
         end 
         RX_STATE_START_BIT: begin
@@ -81,15 +81,15 @@ module UART
             if (rxCounter == DELAY_FRAMES) begin
                 rxState <= RX_STATE_IDLE;
                // rxCounter <= 0;
-                axis_inData_available <= 1;
+                axi_inData_available <= 1;
             end
         end
     endcase
     end
 
-   // axis rx data transfer out of module
+   // axi rx data transfer out of module
     always @(posedge clk) begin
-        if (axis_inData_available & axis_inData_readyToRead) axis_inData_available <= 0;
+        if (axi_inData_available & axi_inData_readyToRead) axi_inData_available <= 0;
     end
 
 
@@ -107,16 +107,16 @@ module UART
     always @(posedge clk) begin
         if (!resetn) begin
             txState <= RX_STATE_IDLE;
-            axis_outData_readyToRead <= 0;
+            axi_outData_readyToRead <= 0;
             uart_tx <= 1;
         end else case (txState)
         TX_STATE_IDLE: begin
-            if (axis_outData_readyToRead & axis_outData_available) begin
+            if (axi_outData_readyToRead & axi_outData_available) begin
                 outDataBuffer <= outData;
                 txState <= TX_STATE_START_BIT;
                 txCounter <= 0;
-                axis_outData_readyToRead <= 0;
-            end else axis_outData_readyToRead <= 1;
+                axi_outData_readyToRead <= 0;
+            end else axi_outData_readyToRead <= 1;
         end 
         TX_STATE_START_BIT: begin
             uart_tx <= 0;

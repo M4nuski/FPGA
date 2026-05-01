@@ -12,12 +12,12 @@ module SPI
   input      SPI_MISO,
   output reg SPI_MOSI = 1,
 
-  //axis write to SPI interface
+  //axi write to SPI interface
   input       MOSI_dataAvailable,
   output reg  MOSI_readyToRead = 0,
   input [7:0] MOSI_data,
 
-  //axis read from SPI interface
+  //axi read from SPI interface
   output reg       MISO_dataAvailable = 0, // when 1 and clock posedge read the content of MISO_data
   input            MISO_readyToRead, // set to 1 to initiate read
   output reg [7:0] MISO_data = 8'b0
