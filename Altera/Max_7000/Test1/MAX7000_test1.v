@@ -13,9 +13,10 @@ module MAX7000_test1
 );
 
 reg [7:0] data = 0;
-assign FT_D = (FT_WRn == 0) ? data : 8'bZZZZZZZZ; // tri-state inout port
+reg WEn = 1;
+assign FT_D = (WEn == 0) ? data : 8'bZZZZZZZZ; // tri-state inout port
 
-reg [1:0] step = 0;
+reg [2:0] step = 0;
 wire [2:0] Hnibble = FT_D[6:4];
 wire [3:0] Lnibble = FT_D[3:0];
  
@@ -48,12 +49,17 @@ case (step)
 	2: begin
 		if (FT_TXn == 0) begin
 			FT_WRn <= 0;
+			WEn <= 0;
 			step <= 3;
 		end else step <= 0;
 	end
 
 	3: begin
-		FT_WRn <= 1;
+		FT_WRn <= 1; // latch data in FIFO
+		step <= 4;
+	end
+	4: begin
+		WEn <= 1; // high-Z after FT_WRn hold-off
 		step <= 0;
 	end
 	
