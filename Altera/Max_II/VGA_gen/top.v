@@ -26,7 +26,7 @@ localparam V_Active = 480;
 localparam V_FrontPorch = 33;
 localparam V_Sync = 2; // neg
 
-wire[2:0] rgb [0:3];
+wire[2:0] rgb [3:0];
 assign rgb[0] = 3'b100;
 assign rgb[1] = 3'b010;
 assign rgb[2] = 3'b001;
@@ -54,9 +54,9 @@ assign pattern1 = active_gate && (H_pix || V_pix);// ? 1 : 0;
 assign pattern2 = active_gate && (H_PixelCount[4] ^ V_LineCount[4]);
 
 // Checkered RGB pattern
-assign pattern2r = active_gate && rgb[{V_LineCount[4], H_PixelCount[4]}][0];
+assign pattern2r = active_gate && rgb[{V_LineCount[4], H_PixelCount[4]}][2];
 assign pattern2g = active_gate && rgb[{V_LineCount[4], H_PixelCount[4]}][1];
-assign pattern2b = active_gate && rgb[{V_LineCount[4], H_PixelCount[4]}][2];
+assign pattern2b = active_gate && rgb[{V_LineCount[4], H_PixelCount[4]}][0];
 
 always @(posedge clkVGA) begin
 	if (H_Count == H_Max) begin
