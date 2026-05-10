@@ -49,3 +49,23 @@ JTAG
 2		1 TCK
 
 attrib -R /S /D *
+
+Problem
+Does the OE1 pin drive High when the MAX3000A device is being programmed?
+Solution
+No, the OE1 pin does not drive high when the MAX3000A device is being programmed. 
+The OE1 pin is the VHJ pin during programming mode which must be set to 11 volts 
+to override the "disable JTAG pins" bit on the device to start the In-System Programming 
+(ISP) operation. If the "disable JTAG pins" bit is not set in the programming files (POF) 
+nor in the device, there is no need to bring VHJ to 11 volts.
+
+EPM7032 = ATF1502
+EPM7064 = ATF1504
+EPM7128 = ATF1508
+
+Now, if in your design you ensure that you can isolate the OE1 pin on the CPLD from any other 
+circuitry (so that you can safely apply +12V to the OE1 pin without blowing the crap out of anything 
+attached to it!) then you can re-enable the JTAG port in this manner. Applying +12V to the OE1 pin 
+through a resistor (1k8 is fine) whilst attemting to reprogram the chip in ATMISP should yield results. 
+I initially get a verify error, but after that the JTAG is unlocked again and usable
+
