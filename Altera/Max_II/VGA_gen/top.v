@@ -13,18 +13,18 @@ module top
 	output reg clkVGA1000
 );
 
-localparam H_BackPorch = 48;
-localparam H_Active = 640;
+localparam H_BackPorch = 60;//48;
+localparam H_Active = 720;//640;
 localparam H_FrontPorch = 16;
-localparam H_Sync = 96; // neg
+localparam H_Sync = 62;//96; // neg
 
-localparam H_Max = 799;
+localparam H_Max = 858-1;//800-1;
 
 
-localparam V_BackPorch = 10;
+localparam V_BackPorch = 30;//10;
 localparam V_Active = 480;
-localparam V_FrontPorch = 33;
-localparam V_Sync = 2; // neg
+localparam V_FrontPorch = 9;//33;
+localparam V_Sync = 6;//2; // neg
 
 wire[2:0] rgb [3:0];
 assign rgb[0] = 3'b100;

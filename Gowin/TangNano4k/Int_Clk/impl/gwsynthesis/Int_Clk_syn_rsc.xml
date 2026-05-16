@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module name="top" Register="22" Lut="30" T_Register="22(22)" T_Lut="30(30)">
+ <SubModule name="OSC"/>
+ <SubModule name="PLL"/>
+</Module>

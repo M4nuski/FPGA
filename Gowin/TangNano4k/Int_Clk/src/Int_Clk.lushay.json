@@ -1,0 +1,14 @@
+ {
+    "name": "Int_Clk",
+    "includedFiles": "all",
+    "externalFlashFiles": [],
+    "top": "top",
+    "constraintsFile": "Int_Clk.cst",
+    "programMode":"ram",
+    "testBenches": "all",
+    "nextPnrGowinOptions": [],
+    "synthGowinOptions": [],
+    "baudRate": 115200,
+    "board": "tangnano4k",
+    "skipCstChecking": false
+}

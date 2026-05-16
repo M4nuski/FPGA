@@ -1,0 +1,15 @@
+module top
+(
+	input clk,
+	
+	inout [7:0] FT_D,
+	input FT_TXn,
+	input FT_RXn,
+	output FT_WRn,
+	output FT_RDn,
+	
+	output [23:0] out,
+	input [23:0] in
+)
+
+endmodule

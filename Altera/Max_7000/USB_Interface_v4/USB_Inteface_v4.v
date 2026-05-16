@@ -1,4 +1,4 @@
-module MAX7000_test1
+module top
 (
 	input clk,
 	

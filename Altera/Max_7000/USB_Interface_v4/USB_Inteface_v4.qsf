@@ -38,7 +38,7 @@
 
 set_global_assignment -name FAMILY MAX7000S
 set_global_assignment -name DEVICE "EPM7128SLC84-15"
-set_global_assignment -name TOP_LEVEL_ENTITY MAX7000_test1
+set_global_assignment -name TOP_LEVEL_ENTITY top
 set_global_assignment -name ORIGINAL_QUARTUS_VERSION "13.0 SP1"
 set_global_assignment -name PROJECT_CREATION_TIME_DATE "17:34:43  APRIL 24, 2026"
 set_global_assignment -name LAST_QUARTUS_VERSION "13.0 SP1"
@@ -121,7 +121,7 @@ set_location_assignment PIN_15 -to FT_D[3]
 set_location_assignment PIN_16 -to FT_D[2]
 set_location_assignment PIN_17 -to FT_D[1]
 set_location_assignment PIN_18 -to FT_D[0]
-set_global_assignment -name VERILOG_FILE MAX7000_test1.v
+set_global_assignment -name VERILOG_FILE USB_Inteface_v4.v
 set_global_assignment -name OPTIMIZE_HOLD_TIMING OFF
 set_global_assignment -name OPTIMIZE_MULTI_CORNER_TIMING OFF
 set_global_assignment -name FITTER_EFFORT "STANDARD FIT"
