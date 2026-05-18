@@ -125,3 +125,5 @@ set_global_assignment -name VERILOG_FILE USB_Inteface_v4.v
 set_global_assignment -name OPTIMIZE_HOLD_TIMING OFF
 set_global_assignment -name OPTIMIZE_MULTI_CORNER_TIMING OFF
 set_global_assignment -name FITTER_EFFORT "STANDARD FIT"
+set_global_assignment -name VERILOG_FILE v1.v
+set_global_assignment -name VERILOG_FILE v2.v
