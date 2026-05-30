@@ -1,0 +1,37 @@
+GowinSynthesis start
+Running parser ...
+Analyzing Verilog file 'C:\OneDrive\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\src\gowin_dpb\gowin_dpb.v'
+Analyzing Verilog file 'C:\OneDrive\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\src\gowin_prom\gowin_prom.v'
+Analyzing Verilog file 'C:\OneDrive\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\src\gowin_sdpb\gowin_sdpb.v'
+Analyzing Verilog file 'C:\OneDrive\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\src\test2.v'
+Analyzing Verilog file 'C:\OneDrive\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\src\VGA_timing.v'
+Compiling module 'top'("C:\OneDrive\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\src\test2.v":1)
+WARN  (EX3791) : Expression size 10 truncated to fit in target size 9("C:\OneDrive\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\src\test2.v":109)
+WARN  (EX3791) : Expression size 10 truncated to fit in target size 9("C:\OneDrive\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\src\test2.v":110)
+WARN  (EX3791) : Expression size 32 truncated to fit in target size 12("C:\OneDrive\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\src\test2.v":125)
+WARN  (EX3791) : Expression size 10 truncated to fit in target size 8("C:\OneDrive\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\src\test2.v":126)
+WARN  (EX3791) : Expression size 25 truncated to fit in target size 24("C:\OneDrive\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\src\test2.v":151)
+Compiling module 'VGA_timing'("C:\OneDrive\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\src\VGA_timing.v":1)
+WARN  (EX3791) : Expression size 32 truncated to fit in target size 16("C:\OneDrive\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\src\VGA_timing.v":32)
+Compiling module 'Gowin_pROM'("C:\OneDrive\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\src\gowin_prom\gowin_prom.v":10)
+Compiling module 'Gowin_SDPB'("C:\OneDrive\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\src\gowin_sdpb\gowin_sdpb.v":10)
+NOTE  (EX0101) : Current top module is "top"
+[5%] Running netlist conversion ...
+Running device independent optimization ...
+[10%] Optimizing Phase 0 completed
+[15%] Optimizing Phase 1 completed
+[25%] Optimizing Phase 2 completed
+Running inference ...
+[30%] Inferring Phase 0 completed
+[40%] Inferring Phase 1 completed
+[50%] Inferring Phase 2 completed
+[55%] Inferring Phase 3 completed
+Running technical mapping ...
+[60%] Tech-Mapping Phase 0 completed
+[65%] Tech-Mapping Phase 1 completed
+[75%] Tech-Mapping Phase 2 completed
+[80%] Tech-Mapping Phase 3 completed
+[90%] Tech-Mapping Phase 4 completed
+[95%] Generate netlist file "C:\OneDrive\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\impl\gwsynthesis\TangNano1k_test2.vg" completed
+[100%] Generate report file "C:\OneDrive\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\impl\gwsynthesis\TangNano1k_test2_syn.rpt.html" completed
+GowinSynthesis finish

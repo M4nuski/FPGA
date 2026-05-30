@@ -1,0 +1,44 @@
+[
+ {
+  "InstFile" : "C:/OneDrive/Prog/FPGA/Gowin/TangNano1k/TangNano1k_test2/src/gowin_dpb/gowin_dpb.v",
+  "InstLine" : 10,
+  "InstName" : "Gowin_DPB",
+  "ModuleFile" : "C:/OneDrive/Prog/FPGA/Gowin/TangNano1k/TangNano1k_test2/src/gowin_dpb/gowin_dpb.v",
+  "ModuleLine" : 10,
+  "ModuleName" : "Gowin_DPB"
+ },
+ {
+  "InstFile" : "C:/OneDrive/Prog/FPGA/Gowin/TangNano1k/TangNano1k_test2/src/test2.v",
+  "InstLine" : 1,
+  "InstName" : "top",
+  "ModuleFile" : "C:/OneDrive/Prog/FPGA/Gowin/TangNano1k/TangNano1k_test2/src/test2.v",
+  "ModuleLine" : 1,
+  "ModuleName" : "top",
+  "SubInsts" : [
+   {
+    "InstFile" : "C:/OneDrive/Prog/FPGA/Gowin/TangNano1k/TangNano1k_test2/src/test2.v",
+    "InstLine" : 153,
+    "InstName" : "VGA",
+    "ModuleFile" : "C:/OneDrive/Prog/FPGA/Gowin/TangNano1k/TangNano1k_test2/src/VGA_timing.v",
+    "ModuleLine" : 1,
+    "ModuleName" : "VGA_timing"
+   },
+   {
+    "InstFile" : "C:/OneDrive/Prog/FPGA/Gowin/TangNano1k/TangNano1k_test2/src/test2.v",
+    "InstLine" : 160,
+    "InstName" : "fontData",
+    "ModuleFile" : "C:/OneDrive/Prog/FPGA/Gowin/TangNano1k/TangNano1k_test2/src/gowin_prom/gowin_prom.v",
+    "ModuleLine" : 10,
+    "ModuleName" : "Gowin_pROM"
+   },
+   {
+    "InstFile" : "C:/OneDrive/Prog/FPGA/Gowin/TangNano1k/TangNano1k_test2/src/test2.v",
+    "InstLine" : 162,
+    "InstName" : "charRAM",
+    "ModuleFile" : "C:/OneDrive/Prog/FPGA/Gowin/TangNano1k/TangNano1k_test2/src/gowin_sdpb/gowin_sdpb.v",
+    "ModuleLine" : 10,
+    "ModuleName" : "Gowin_SDPB"
+   }
+  ]
+ }
+]

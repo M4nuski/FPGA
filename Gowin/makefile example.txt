@@ -32,3 +32,34 @@ clean:
 
 .PHONY: load clean test
 .INTERMEDIATE: uart_pnr.json uart.json uart_test.o
+
+
+tang nano 1
+
+Info:	Target Cable: Gowin USB Cable(WINUSB)/0/35/null@2.5MHz
+Info:	Target Device: GW1NZ-1(0x0100681B)
+Info:	Operation "Read Device Codes" for device#1...
+Info:	ID Code is: 0x00FA00FA
+Info:	User Code is: 0x681B3600
+Info:	Status Code is: 0x0000BA59
+Info:	Finished.
+Info:	Cost 0.06 second(s)
+Info:	Cost 0.02 second(s)
+:	 
+Info:	Cable found:  Gowin USB Cable(WINUSB)/0/35/null (USB location:35) (SN: null)
+Info:	Cost 0.01 second(s)
+:	 
+Info:	Target Cable: Gowin USB Cable(WINUSB)/0/35/null@0.5MHz
+Info:	Target Device: GW1NZ-1(0x0100681B)
+Info:	Operation "Read Device Codes" for device#1...
+Info:	ID Code is: 0x0100681B
+Info:	User Code is: 0x00000000
+Info:	Status Code is: 0x00039220
+Info:	Finished.
+Info:	Cost 0.06 second(s)
+
+LCD_RGB480x272
+C:\Apps\oss-cad-suite\bin\nextpnr-himbaechel.exe --json LCD_RGB480x272.json --freq 27 --write LCD_RGB480x272_pnr.json --device GW1NZ-LV1QN48C6/I5 --vopt family=GW1NZ-1 --vopt cst=LCD_RGB480x272.cst
+C:\Apps\oss-cad-suite\bin\gowin_pack.exe -d GW1NZ-1 -o test1NZ-1.fs LCD_RGB480x272_pnr.json   
+
+:	 

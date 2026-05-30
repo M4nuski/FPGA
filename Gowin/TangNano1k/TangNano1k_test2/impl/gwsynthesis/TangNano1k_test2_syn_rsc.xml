@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module name="top" Register="107" Alu="59" Lut="163" T_Register="139(107)" T_Alu="59(59)" T_Lut="251(163)" T_Bsram="3(0)">
+ <SubModule name="VGA" Register="32" Lut="88" T_Register="32(32)" T_Lut="88(88)"/>
+ <SubModule name="fontData" Bsram="1" T_Bsram="1(1)"/>
+ <SubModule name="charRAM" Bsram="2" T_Bsram="2(2)"/>
+</Module>
