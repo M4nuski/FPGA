@@ -1,5 +1,6 @@
 //`define VERSION_1
 `define VERSION_2
+//`define VERSION_3
 
 module top
 (
@@ -31,6 +32,20 @@ module top
 	
 `elsif VERSION_2
 	v2 top_v2(
+		clk,
+		
+		FT_D,
+		FT_TXn,
+		FT_RXn,
+		FT_WRn,
+		FT_RDn,
+		
+		out,
+		in
+	);
+	
+`elsif VERSION_3
+	v2 top_v3(
 		clk,
 		
 		FT_D,
