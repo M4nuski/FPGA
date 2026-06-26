@@ -1,11 +1,14 @@
 // 640x480@60
+// 25.175 pin 14
+//
+// AFSB
 /*
 module top
 (
-	input clkVGA, // PIN14
+	input clkVGA, // PIN14 25.175MHz 
 
-	output vsync,
-	output hsync,
+	output vsync, // inverted through 74LVC2G14
+	output hsync, // inverted through 74LVC2G14
 	output pattern1,
 	output pattern2,
 	output pattern2r,
@@ -15,16 +18,16 @@ module top
 	output reg clkVGA1000
 );
 
-localparam H_BackPorch = 40;
 localparam H_Active = 640;
-localparam H_FrontPorch = 8;
+localparam H_FrontPorch = 16;
 localparam H_Sync = 96;
+localparam H_BackPorch = 48;
 localparam H_Max = 800-1;
 
-localparam V_BackPorch = 25;
 localparam V_Active = 480;
-localparam V_FrontPorch = 2;
+localparam V_FrontPorch = 10;
 localparam V_Sync = 2;
+localparam V_BackPorch = 33;
 localparam V_Max = 525-1;
 
 wire[2:0] rgb [3:0];
@@ -36,11 +39,23 @@ assign rgb[3] = 3'b111;
 reg[9:0] H_Count = 0;
 reg[9:0] V_Count = 0;
 
-wire[9:0] H_PixelCount = H_Count - H_BackPorch;
-wire[9:0] V_LineCount = V_Count - V_BackPorch;
+wire[9:0] H_PixelCount = H_Count;// - H_BackPorch;
+wire[9:0] V_LineCount = V_Count;// - V_BackPorch;
 
-assign vsync = (V_Count > (V_BackPorch + V_Active + V_FrontPorch - 1)); 
-assign hsync = (H_Count > (H_BackPorch + H_Active + H_FrontPorch - 1)); 
+// a 100
+// f 2
+// s 2
+// b 2
+// t 106
+// m 105
+
+// ca 0 - 99
+// cf 100 - 101
+// cs 102 - 103
+// cb 104 - 105
+
+assign vsync = ! ( (V_Count > (V_Active + V_FrontPorch - 1)) && (V_Count < (V_Active + V_FrontPorch + V_Sync)) );
+assign hsync =  ( (H_Count > (H_Active + H_FrontPorch - 1)) && (H_Count < (H_Active + H_FrontPorch + H_Sync)) );
 
 wire active_gate = (H_PixelCount < H_Active) && (V_LineCount < V_Active);
 
