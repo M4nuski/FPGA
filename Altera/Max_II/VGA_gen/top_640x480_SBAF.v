@@ -1,11 +1,14 @@
 // 640x480@60
+// 25.175 pin 14
+//
+// SBAF - sync ok but nothing on small screen
 /*
 module top
 (
-	input clkVGA, // PIN14
+	input clkVGA, // PIN14 25.175MHz 
 
-	output vsync,
-	output hsync,
+	output vsync, // inverted by 74LVC2G14
+	output hsync, // inverted by 74LVC2G14
 	output pattern1,
 	output pattern2,
 	output pattern2r,
@@ -15,17 +18,18 @@ module top
 	output reg clkVGA1000
 );
 
-localparam H_BackPorch = 40;
-localparam H_Active = 640;
-localparam H_FrontPorch = 8;
-localparam H_Sync = 96;
-localparam H_Max = 800-1;
 
-localparam V_BackPorch = 25;
+localparam H_Active = 640;
+localparam H_FrontPorch = 16;
+localparam H_Sync = 96;
+localparam H_BackPorch = 48;
+localparam H_Max = H_Active + H_FrontPorch + H_Sync + H_BackPorch - 1;
+
 localparam V_Active = 480;
-localparam V_FrontPorch = 2;
+localparam V_FrontPorch = 10;
 localparam V_Sync = 2;
-localparam V_Max = 525-1;
+localparam V_BackPorch = 33;
+localparam V_Max = V_Active + V_FrontPorch + V_Sync + V_BackPorch - 1;
 
 wire[2:0] rgb [3:0];
 assign rgb[0] = 3'b100;
@@ -36,11 +40,11 @@ assign rgb[3] = 3'b111;
 reg[9:0] H_Count = 0;
 reg[9:0] V_Count = 0;
 
-wire[9:0] H_PixelCount = H_Count - H_BackPorch;
-wire[9:0] V_LineCount = V_Count - V_BackPorch;
+wire[9:0] H_PixelCount = H_Count - H_Sync - H_BackPorch;
+wire[9:0] V_LineCount  = V_Count - V_Sync - V_BackPorch;
 
-assign vsync = (V_Count > (V_BackPorch + V_Active + V_FrontPorch - 1)); 
-assign hsync = (H_Count > (H_BackPorch + H_Active + H_FrontPorch - 1)); 
+assign hsync = (H_Count < H_Sync);
+assign vsync = (V_Count < V_Sync);
 
 wire active_gate = (H_PixelCount < H_Active) && (V_LineCount < V_Active);
 
@@ -82,5 +86,5 @@ always @(posedge clkVGA) begin
 	end
 end
 
-
-endmodule*/
+endmodule
+*/

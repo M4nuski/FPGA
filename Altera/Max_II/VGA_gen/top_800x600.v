@@ -1,5 +1,5 @@
 // 800x600@72
-
+/*
 module top
 (
 	input clkVGA, // 50MHz pin 64
@@ -84,3 +84,4 @@ end
 
 
 endmodule
+*/
