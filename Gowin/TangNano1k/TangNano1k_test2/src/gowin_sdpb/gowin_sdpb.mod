@@ -1,19 +1,19 @@
--series GW1NR
--device GW1NR-9
--device_version C
--package QFN88P
--part_number GW1NR-LV9QN88PC6/I5
+-series GW1NZ
+-device GW1NZ-1
+-device_version 
+-package QFN48
+-part_number GW1NZ-LV1QN48C6/I5
 
 
--mod_name Gowin_SDPB
+-mod_name Gowin_SDPB_512x8
 -file_name gowin_sdpb
--path C:/OneDrive/PRog/FPGA/TankNano9k_test1/src/gowin_sdpb/
+-path C:/Dropbox/Prog/FPGA/Gowin/TangNano1k/TangNano1k_test2/src/gowin_sdpb/
 -type RAM_SDP
 -file_type vlg
 -bram_b true
--depth_0 4096
--depth_1 4096
+-depth_0 512
+-depth_1 512
 -width_0 8
 -width_1 8
--read_mode pipeline
+-read_mode bypass
 -reset_mode sync

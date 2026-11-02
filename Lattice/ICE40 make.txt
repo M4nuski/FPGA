@@ -1,3 +1,18 @@
 yosys -p "read_verilog Port_counter.v; synth_ice40 -top top -json Port_counter.synth.json"
 nextpnr-ice40 --json Port_counter.synth.json --asc Port_counter.asc --lp384 --package qn32 --pcf Port_counter.pcf
 icepack -v Port_counter.asc Port_counter.bin
+
+$env:Path += ";C:\Apps\oss-cad-suite\bin"
+
+yosys VERA49_v1.ys
+nextpnr-ice40 --json build\VERA49_v1.json --asc VERA49_v1.asc --up5k --package sg48 --pcf VERA49_v1.pcf 
+
+nextpnr-ice40 --json build\VERA49_v1.json --asc build\VERA49_v1.asc --up5k --package sg48 --pcf VERA49_v1.pcf
+icepack build\VERA49_v1.asc build\VERA49_v1.bin
+
+nextpnr-ice40 --json build\VERA49_v1.json --asc build\VERA49_v1.asc --up5k --package sg48 --pcf VERA49_v1.pcf --opt-timing
+
+hierarchy -top <top module>
+proc
+opt
+synth_ice40

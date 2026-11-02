@@ -5,33 +5,33 @@
 1. PnR Messages
 
   <Report Title>: PnR Report
-  <Design File>: C:\OneDrive\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\impl\gwsynthesis\TangNano1k_test2.vg
-  <Physical Constraints File>: C:\OneDrive\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\src\test2.cst
+  <Design File>: C:\Dropbox\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\impl\gwsynthesis\TangNano1k_test2.vg
+  <Physical Constraints File>: C:\Dropbox\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\src\test2.cst
   <Timing Constraints File>: ---
   <Tool Version>: V1.9.11.03 Education
   <Part Number>: GW1NZ-LV1QN48C6/I5
   <Device>: GW1NZ-1
-  <Created Time>:Sat May 23 17:59:07 2026
+  <Created Time>:Sun Nov  1 21:23:23 2026
 
 
 2. PnR Details
 
   Running placement:
-    Placement Phase 0: CPU time = 0h 0m 0.025s, Elapsed time = 0h 0m 0.025s
-    Placement Phase 1: CPU time = 0h 0m 0.017s, Elapsed time = 0h 0m 0.016s
-    Placement Phase 2: CPU time = 0h 0m 0.019s, Elapsed time = 0h 0m 0.019s
-    Placement Phase 3: CPU time = 0h 0m 0.465s, Elapsed time = 0h 0m 0.465s
-    Total Placement: CPU time = 0h 0m 0.526s, Elapsed time = 0h 0m 0.525s
+    Placement Phase 0: CPU time = 0h 0m 0.03s, Elapsed time = 0h 0m 0.03s
+    Placement Phase 1: CPU time = 0h 0m 0.009s, Elapsed time = 0h 0m 0.009s
+    Placement Phase 2: CPU time = 0h 0m 0.026s, Elapsed time = 0h 0m 0.026s
+    Placement Phase 3: CPU time = 0h 0m 0.414s, Elapsed time = 0h 0m 0.414s
+    Total Placement: CPU time = 0h 0m 0.479s, Elapsed time = 0h 0m 0.479s
  Running routing:
     Routing Phase 0: CPU time = 0h 0m 0s, Elapsed time = 0h 0m 0s
-    Routing Phase 1: CPU time = 0h 0m 0.018s, Elapsed time = 0h 0m 0.018s
-    Routing Phase 2: CPU time = 0h 0m 0.088s, Elapsed time = 0h 0m 0.088s
+    Routing Phase 1: CPU time = 0h 0m 0.01s, Elapsed time = 0h 0m 0.01s
+    Routing Phase 2: CPU time = 0h 0m 0.149s, Elapsed time = 0h 0m 0.149s
     Routing Phase 3: CPU time = 0h 0m 0s, Elapsed time = 0h 0m 0s
-    Total Routing: CPU time = 0h 0m 0.106s, Elapsed time = 0h 0m 0.106s
+    Total Routing: CPU time = 0h 0m 0.159s, Elapsed time = 0h 0m 0.159s
  Generate output files:
-    CPU time = 0h 0m 0.185s, Elapsed time = 0h 0m 0.185s
+    CPU time = 0h 0m 0.153s, Elapsed time = 0h 0m 0.153s
 
- Total Time and Memory Usage: CPU time = 0h 0m 0.817s, Elapsed time = 0h 0m 0.816s, Peak memory usage = 195MB
+ Total Time and Memory Usage: CPU time = 0h 0m 0.791s, Elapsed time = 0h 0m 0.791s, Peak memory usage = 281MB
 
 
 3. Resource Usage Summary
@@ -39,23 +39,23 @@
   --------------------------------------------------------------------------------
   Resources                   | Usage                               | Utilization
   --------------------------------------------------------------------------------
-  Logic                       | 318/1152                            |  28%
-    --LUT,ALU,ROM16           | 318(250 LUT, 68 ALU, 0 ROM16)       | -
-    --SSRAM(RAM16)            | 0                                   | -
-  Register                    | 139/957                             |  15%
+  Logic                       | 907/1152                            |  79%
+    --LUT,ALU,ROM16           | 523(437 LUT, 86 ALU, 0 ROM16)       | -
+    --SSRAM(RAM16)            | 64                                  | -
+  Register                    | 65/957                              |  7%
     --Logic Register as Latch | 0/864                               |  0%
-    --Logic Register as FF    | 128/864                             |  15%
+    --Logic Register as FF    | 65/864                              |  8%
     --I/O Register as Latch   | 0/93                                |  0%
-    --I/O Register as FF      | 11/93                               |  12%
-  CLS                         | 203/576                             |  36%
-  I/O Port                    | 32/41                               |  79%
-  I/O Buf                     | 32                                  | -
-    --Input Buf               | 12                                  | -
+    --I/O Register as FF      | 0/93                                |  0%
+  CLS                         | 499/576                             |  87%
+  I/O Port                    | 33/41                               |  81%
+  I/O Buf                     | 21                                  | -
+    --Input Buf               | 1                                   | -
     --Output Buf              | 20                                  | -
     --Inout Buf               | 0                                   | -
-  BSRAM                       | 3/4                                 | 75%
-    --SDPB                    | 2
-    --pROM                    | 1
+  BSRAM                       | 4/4                                 | 100%
+    --SDPB                    | 4
+  FLASH64KZ                   | 1/1                                 | 100%
   ================================================================================
 
 
@@ -65,7 +65,7 @@
   --------------------------------------
   I/O Bank  | Usage       | Utilization 
   --------------------------------------
-  bank 0   | 10/18       | 56%         
+  bank 0   | 11/18       | 62%         
   bank 1   | 22/23       | 96%         
   ======================================
 
@@ -75,8 +75,8 @@
   ------------------------------------------
   Clock Resource| Usage         | Utilization 
   ------------------------------------------
-  PRIMARY       | 3/8           | 38%
-  LW            | 0/8           | 0%
+  PRIMARY       | 2/8           | 25%
+  LW            | 1/8           | 13%
   GCLK_PIN      | 3/3           | 100%
   ==========================================
 
@@ -87,8 +87,8 @@
   Signal         | Global Clock   | Location
   -------------------------------------------
   XTAL_IN_d      | PRIMARY        |  LEFT RIGHT
-  WRn_d          | PRIMARY        |  RIGHT
   LCD_CLK_d      | PRIMARY        |  LEFT RIGHT
+  div3Clock[0]   | LW             |  -
   ===========================================
 
 
@@ -101,6 +101,7 @@ XTAL_IN     | -         | 47/0          | Y          | in    | IOT10[A] | GCLKT_
 WRn         | -         | 42/0          | Y          | in    | IOT14[B] | MODE1           | LVCMOS33   | NA    | UP        | NA        | NONE       | NA         | 3.3       
 address[0]  | -         | 39/0          | Y          | in    | IOT16[B] | -               | LVCMOS33   | NA    | DOWN      | NA        | NONE       | NA         | 3.3       
 address[1]  | -         | 38/0          | Y          | in    | IOT17[A] | -               | LVCMOS33   | NA    | DOWN      | NA        | NONE       | NA         | 3.3       
+address[2]  | -         | 44/0          | Y          | in    | IOT13[A] | JTAGSEL_N       | LVCMOS33   | NA    | UP        | NA        | NONE       | NA         | 3.3       
 data[0]     | -         | 41/0          | Y          | in    | IOT15[B] | -               | LVCMOS33   | NA    | UP        | NA        | NONE       | NA         | 3.3       
 data[1]     | -         | 40/0          | Y          | in    | IOT16[A] | -               | LVCMOS33   | NA    | UP        | NA        | NONE       | NA         | 3.3       
 data[2]     | -         | 13/1          | Y          | in    | IOR10[B] | -               | LVCMOS33   | NA    | UP        | NA        | NONE       | NA         | 3.3       
@@ -149,7 +150,7 @@ Loc./Bank| Signal      | Dir.  | Site     | CFG             | IO Type  | Drive |
 8/0      | LCD_CLK     | out   | IOT10[B] | GCLKC_0         | LVCMOS33 | 12    | UP        | NA        | NA         | OFF        | 3.3  
 46/0     | data[4]     | in    | IOT12[A] | DONE            | LVCMOS33 | NA    | UP        | NA        | NONE       | NA         | 3.3  
 45/0     | data[3]     | in    | IOT12[B] | READY           | LVCMOS33 | NA    | UP        | NA        | NONE       | NA         | 3.3  
-44/0     | -           | in    | IOT13[A] | JTAGSEL_N       | LVCMOS33 | NA    | UP        | NA        | NONE       | NA         | 3.3  
+44/0     | address[2]  | in    | IOT13[A] | JTAGSEL_N       | LVCMOS33 | NA    | UP        | NA        | NONE       | NA         | 3.3  
 43/0     | -           | in    | IOT14[A] | MODE0           | LVCMOS33 | NA    | UP        | NA        | NONE       | NA         | 3.3  
 42/0     | WRn         | in    | IOT14[B] | MODE1           | LVCMOS33 | NA    | UP        | NA        | NONE       | NA         | 3.3  
 41/0     | data[0]     | in    | IOT15[B] | -               | LVCMOS33 | NA    | UP        | NA        | NONE       | NA         | 3.3  

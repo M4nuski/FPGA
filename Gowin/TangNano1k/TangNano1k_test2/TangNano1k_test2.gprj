@@ -5,11 +5,17 @@
     <Version>5</Version>
     <Device name="GW1NZ-1" pn="GW1NZ-LV1QN48C6/I5">gw1nz1-015</Device>
     <FileList>
-        <File path="src/gowin_dpb/gowin_dpb.v" type="file.verilog" enable="1"/>
-        <File path="src/gowin_prom/gowin_prom.v" type="file.verilog" enable="1"/>
-        <File path="src/gowin_sdpb/gowin_sdpb.v" type="file.verilog" enable="1"/>
+        <File path="src/VGA_timing.v" type="file.verilog" enable="1"/>
+        <File path="src/gowin_dpb/gowin_dpb.v" type="file.verilog" enable="0"/>
+        <File path="src/gowin_prom/gowin_prom.v" type="file.verilog" enable="0"/>
+        <File path="src/gowin_ram16sdp/gowin_ram16sdp.v" type="file.verilog" enable="0"/>
+        <File path="src/gowin_ram16sdp/gowin_ram16sdp_512x8.v" type="file.verilog" enable="1"/>
+        <File path="src/gowin_sdpb/gowin_sdpb.v" type="file.verilog" enable="0"/>
+        <File path="src/gowin_sdpb/gowin_sdpb_512x8_mi.v" type="file.verilog" enable="0"/>
+        <File path="src/gowin_sdpb/gowin_sdpb_7200x4_mi.v" type="file.verilog" enable="1"/>
+        <File path="src/gowin_sdpb2/gowin_sdpb_7200x4.v" type="file.verilog" enable="0"/>
+        <File path="src/gowin_user_flash/gowin_user_flash.v" type="file.verilog" enable="1"/>
         <File path="src/test2.v" type="file.verilog" enable="1"/>
         <File path="src/test2.cst" type="file.cst" enable="1"/>
-	<File path="src/VGA_timing.v" type="file.verilog" enable="1"/>
     </FileList>
 </Project>

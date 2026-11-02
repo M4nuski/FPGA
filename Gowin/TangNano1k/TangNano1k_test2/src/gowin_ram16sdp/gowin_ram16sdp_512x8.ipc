@@ -1,0 +1,13 @@
+[General]
+ipc_version=4
+file=gowin_ram16sdp_512x8
+module=Gowin_RAM16SDP_512x8
+target_device=gw1nz1-015
+type=ssram_ram16sdp
+version=1.0
+
+[Config]
+DEPTH=512
+LANG=0
+MEM_FILE=C:/Dropbox/Prog/Python/Text/data.mi
+WIDTH=8

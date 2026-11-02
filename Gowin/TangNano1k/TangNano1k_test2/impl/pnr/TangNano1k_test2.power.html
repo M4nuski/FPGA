@@ -61,11 +61,11 @@ table.detail_table th.label {  min-width: 8%; width: 8%; }
 </tr>
 <tr>
 <td class="label">Design File</td>
-<td>C:\OneDrive\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\impl\gwsynthesis\TangNano1k_test2.vg</td>
+<td>C:\Dropbox\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\impl\gwsynthesis\TangNano1k_test2.vg</td>
 </tr>
 <tr>
 <td class="label">Physical Constraints File</td>
-<td>C:\OneDrive\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\src\test2.cst</td>
+<td>C:\Dropbox\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\src\test2.cst</td>
 </tr>
 <tr>
 <td class="label">Timing Constraints File</td>
@@ -85,7 +85,7 @@ table.detail_table th.label {  min-width: 8%; width: 8%; }
 </tr>
 <tr>
 <td class="label">Created Time</td>
-<td>Sat May 23 17:59:07 2026
+<td>Sun Nov  1 21:23:23 2026
 </td>
 </tr>
 <tr>
@@ -157,22 +157,22 @@ table.detail_table th.label {  min-width: 8%; width: 8%; }
 <table class="summary_table">
 <tr>
 <td class="label">Total Power (mW)</td>
-<td>10.531</td>
+<td>11.983</td>
 </tr>
 <tr>
 <td class="label">Quiescent Power (mW)</td>
-<td>6.943</td>
+<td>6.965</td>
 </tr>
 <tr>
 <td class="label">Dynamic Power (mW)</td>
-<td>3.589</td>
+<td>5.018</td>
 </tr>
 </table>
 <h2><a name="Thermal_Info">Thermal Information:</a></h2>
 <table class="summary_table">
 <tr>
 <td class="label">Junction Temperature</td>
-<td>25.435</td>
+<td>25.495</td>
 </tr>
 <tr>
 <td class="label">Theta JA</td>
@@ -180,7 +180,7 @@ table.detail_table th.label {  min-width: 8%; width: 8%; }
 </tr>
 <tr>
 <td class="label">Max Allowed Ambient Temperature</td>
-<td>84.565</td>
+<td>84.505</td>
 </tr>
 </table>
 <h2><a name="Supply_Summary">Supply Information:</a></h2>
@@ -195,23 +195,23 @@ table.detail_table th.label {  min-width: 8%; width: 8%; }
 <tr>
 <td>VCC</td>
 <td>1.200</td>
-<td>1.952</td>
+<td>3.377</td>
 <td>3.000</td>
-<td>5.942</td>
+<td>7.652</td>
 </tr>
 <tr>
 <td>VCCX</td>
 <td>3.300</td>
-<td>0.189</td>
+<td>0.146</td>
 <td>0.500</td>
-<td>2.273</td>
+<td>2.133</td>
 </tr>
 <tr>
 <td>VCCIO33</td>
 <td>3.300</td>
-<td>0.189</td>
-<td>0.513</td>
-<td>2.316</td>
+<td>0.146</td>
+<td>0.520</td>
+<td>2.198</td>
 </tr>
 </table>
 <h1><a name="Detail">Power Details</a></h1>
@@ -225,19 +225,19 @@ table.detail_table th.label {  min-width: 8%; width: 8%; }
 </tr>
 <tr>
 <td>Logic</td>
-<td>0.056</td>
+<td>0.090</td>
 <td>NA</td>
-<td>3.422</td>
+<td>2.946</td>
 </tr>
 <tr>
 <td>IO</td>
-<td>4.267
-<td>2.793
-<td>4.852
+<td>3.829
+<td>2.688
+<td>4.500
 </tr>
 <tr>
 <td>BSRAM</td>
-<td>2.057
+<td>3.784
 <td>NA</td>
 <td>NA</td>
 </tr>
@@ -251,20 +251,24 @@ table.detail_table th.label {  min-width: 8%; width: 8%; }
 </tr>
 <tr>
 <td>top</td>
-<td>2.113</td>
-<td>2.113(2.064)</td>
+<td>3.874</td>
+<td>3.874(3.829)</td>
 <tr>
 <td>top/VGA/</td>
-<td>0.007</td>
-<td>0.007(0.000)</td>
+<td>0.009</td>
+<td>0.009(0.000)</td>
 <tr>
-<td>top/charRAM/</td>
-<td>1.983</td>
-<td>1.983(0.000)</td>
+<td>top/bitmapRAM/</td>
+<td>3.784</td>
+<td>3.784(0.000)</td>
 <tr>
-<td>top/fontData/</td>
-<td>0.074</td>
-<td>0.074(0.000)</td>
+<td>top/fontROM/</td>
+<td>0.000</td>
+<td>0.000(0.000)</td>
+<tr>
+<td>top/textRAM/</td>
+<td>0.036</td>
+<td>0.036(0.000)</td>
 </table>
 <h2><a name="By_Clock_Domain">Power By Clock Domain:</a></h2>
 <table class="detail_table">
@@ -274,19 +278,24 @@ table.detail_table th.label {  min-width: 8%; width: 8%; }
 <th class="label">Total Dynamic Power(mW)</th>
 </tr>
 <tr>
-<td>XTAL_IN</td>
-<td>27.000</td>
-<td>2.002</td>
-</tr>
-<tr>
-<td>WRn</td>
-<td>27.000</td>
-<td>0.011</td>
-</tr>
-<tr>
 <td>LCD_CLK_d</td>
 <td>27.000</td>
-<td>0.102</td>
+<td>0.076</td>
+</tr>
+<tr>
+<td>NO CLOCK DOMAIN</td>
+<td>0.000</td>
+<td>0.000</td>
+</tr>
+<tr>
+<td>XTAL_IN</td>
+<td>27.000</td>
+<td>3.786</td>
+</tr>
+<tr>
+<td>div3Clock[0]</td>
+<td>27.000</td>
+<td>0.014</td>
 </tr>
 </table>
 </div><!-- content -->

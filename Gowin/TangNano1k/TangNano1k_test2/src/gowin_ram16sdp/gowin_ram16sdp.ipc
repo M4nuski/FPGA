@@ -1,0 +1,12 @@
+[General]
+ipc_version=4
+file=gowin_ram16sdp
+module=Gowin_RAM16SDP_16x8
+target_device=gw1nz1-015
+type=ssram_ram16sdp
+version=1.0
+
+[Config]
+DEPTH=16
+LANG=0
+WIDTH=8

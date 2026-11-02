@@ -1,8 +1,8 @@
--d C:\OneDrive\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\impl\gwsynthesis\TangNano1k_test2.vg
+-d C:\Dropbox\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\impl\gwsynthesis\TangNano1k_test2.vg
 -p GW1NZ-1-QFN48-6
 -pn GW1NZ-LV1QN48C6/I5
--cst C:\OneDrive\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\src\test2.cst
--cfg C:\OneDrive\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\impl\pnr\device.cfg
+-cst C:\Dropbox\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\src\test2.cst
+-cfg C:\Dropbox\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\impl\pnr\device.cfg
 -bit
 -tr
 -ph

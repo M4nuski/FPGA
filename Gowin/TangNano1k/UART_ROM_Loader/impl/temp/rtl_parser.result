@@ -1,0 +1,20 @@
+[
+ {
+  "InstFile" : "C:/Dropbox/Prog/FPGA/Gowin/TangNano1k/UART_ROM_Loader/src/top.v",
+  "InstLine" : 2,
+  "InstName" : "top",
+  "ModuleFile" : "C:/Dropbox/Prog/FPGA/Gowin/TangNano1k/UART_ROM_Loader/src/top.v",
+  "ModuleLine" : 2,
+  "ModuleName" : "top",
+  "SubInsts" : [
+   {
+    "InstFile" : "C:/Dropbox/Prog/FPGA/Gowin/TangNano1k/UART_ROM_Loader/src/top.v",
+    "InstLine" : 47,
+    "InstName" : "uart",
+    "ModuleFile" : "C:/Dropbox/Prog/FPGA/Gowin/TangNano1k/UART_ROM_Loader/src/UART.v",
+    "ModuleLine" : 6,
+    "ModuleName" : "UART"
+   }
+  ]
+ }
+]

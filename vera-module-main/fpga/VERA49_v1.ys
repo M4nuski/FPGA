@@ -1,0 +1,42 @@
+read_verilog -D ICE40_HX -lib -specify +/ice40/cells_sim.v
+
+read_verilog source\top.v
+read_verilog source\dpram.v
+read_verilog source\main_ram.v
+read_verilog source\reset_sync.v
+read_verilog source\vram_if.v
+read_verilog source\addr_data.v
+read_verilog source\mult_accum.v
+
+read_verilog source\audio\audio.v
+read_verilog source\audio\audio_fifo.v
+read_verilog source\audio\dacif.v
+read_verilog source\audio\pcm.v
+read_verilog source\audio\psg.v
+
+read_verilog source\spi\spictrl.v
+
+read_verilog source\video\video_vga.v
+read_verilog source\video\video_composite.v
+read_verilog source\video\video_modulator.v
+read_verilog source\video\video_modulator_coslut.v
+read_verilog source\video\video_modulator_sinlut.v
+
+read_verilog source\generated\palette_ram\rtl\palette_ram.v
+read_verilog source\generated\sprite_ram\rtl\sprite_ram.v
+
+read_verilog source\graphics\composer.v
+read_verilog source\graphics\sprite_line_buffer.v
+read_verilog source\graphics\sprite_renderer.v
+read_verilog source\graphics\layer_line_buffer.v
+read_verilog source\graphics\layer_renderer.v
+
+#hierarchy -top top
+#proc_clean
+#opt
+
+synth_ice40 -top top -json build\VERA49_v1.json
+
+#write_verilog build\VERA49_v1.v
+
+stat
