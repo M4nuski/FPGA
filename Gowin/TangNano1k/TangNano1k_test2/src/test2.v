@@ -1,3 +1,7 @@
+// Test implementation for dual Text mode and Bitmap mode graphic card
+// Driving a 480x272 display via RGB565 parallel interface
+//
+
 module top
 (
     input XTAL_IN,
@@ -148,9 +152,10 @@ always @(posedge WRn) begin
 end
 
 wire [9:0] h;//todo reduce bitwidth
-wire [9:0] ph = h + 10'd1; // fetch char 1 pixel in advance
+wire [9:0] ph = h + 10'd1; // fetch char 1 pixel in advance // TODO replace with hpand offset
 wire [9:0] v;
-
+wire [9:0] hp;
+wire [9:0] vp;
 
 wire [7:0] tdin;
 wire [8:0] tadb;
@@ -223,7 +228,7 @@ assign tdin = (CLS) ? ((Reset == 1) ? (counter[7:0] + 8'h21) : 0) : currentData;
 wire [31:0] fdout;
 wire [13:0] fontAddress = (tdout * 64) + h[3:1] + (v[3:1] * 8); 
 wire fontBit = fdout[~fontAddress[4:0]];
-wire fontCarret = ((blinkerCounter[23] == 1) && (cursor == (h[8:4] + voffset)) && (v[3:1] == 3'd7)) ? (blink ? 1 : fontBit) : fontBit;
+wire fontCarret = ((blinkerCounter[22] == 1) && (cursor == (h[8:4] + voffset)) && (v[3:1] == 3'd7)) ? (blink ? 1 : fontBit) : fontBit;
 
 //overlay font data
 assign LCD_R = (fontCarret == 1) ? fontColor[15:11] : selColor[15:11];
@@ -248,25 +253,28 @@ assign LCD_B = ((h[2] ^ v[2]) == 1) ? 5'b11111 : 5'b00000 ;*/
 //wire [5:0] gen_G;
 //wire [4:0] gen_B;
 
-reg [6:0] bCount = 0;
-reg [1:0] div3Clock = 0;
+reg [7:0] bitmapHorizontalOffset = 0;
+reg [1:0] bitmapHdiv3 = 0;
 reg [1:0] bitmapVdiv3 = 0;
-always @(posedge LCD_CLK) if ((div3Clock == 2'd2) | (h == 0)) div3Clock <= 0; else div3Clock <= div3Clock + 2'd1; 
-
-//wire lineClock = v == 0;
 
 
-always @(posedge div3Clock) begin
-    if (h == 1) begin
-        bCount <= 0;    
-        if (v == 1) begin 
+always @(posedge LCD_CLK ) begin
+    if (hp == 10'd1) begin
+        bitmapHorizontalOffset <= 0; 
+        bitmapHdiv3 <= 0;
+        if (vp == 10'd2) begin 
             bitmapVdiv3 <= 0;
             bitmapLineOffset <= 0;
         end else if (bitmapVdiv3 == 2'd2) begin
             bitmapVdiv3 <= 0;
             bitmapLineOffset <= bitmapLineOffset + 14'd160;
         end else bitmapVdiv3 <= bitmapVdiv3 + 2'd1;
-    end else bCount <= bCount + 6'd1; 
+    end else begin
+        if (bitmapHdiv3 == 2'd2) begin
+            bitmapHdiv3 <= 0;
+            bitmapHorizontalOffset <= bitmapHorizontalOffset + 2'd1;
+        end else bitmapHdiv3 <= bitmapHdiv3 + 2'd1;
+    end
 end
 
 reg [13:0] bitmapLineOffset = 0;
@@ -274,7 +282,7 @@ reg [13:0] bitmapLineOffset = 0;
 
 wire [3:0] bdin = counter[3:0];
 wire [3:0] bdout;
-wire [13:0] badb = bCount + bitmapLineOffset ;// + ((v/3)*480);
+wire [13:0] badb = bitmapHorizontalOffset + bitmapLineOffset ;
 wire [13:0] bada = badb;
 wire [15:0] selColor = palette[bdout];
 /*
@@ -307,7 +315,7 @@ always @(posedge LCD_CLK) blinkerCounter <= blinkerCounter + 24'd1;
 VGA_timing VGA(
 	LCD_CLK, !Reset,
 	LCD_DEN, LCD_HYNC, LCD_SYNC,	
-	h, v
+	h, v, hp, vp
 );
 //14 bit addres, 1 bit data
 //Gowin_pROM fontData(fontBit, LCD_CLK, 1'b1, 1'b1, 1'b0, fontAddress);
@@ -331,7 +339,7 @@ wire [4:0] fxadr = {2'b00, fontAddress[13:11]}; // row
 wire fse = XTAL_IN;
 Gowin_User_Flash fontROM (fdout, 1'b1, 1'b1, fse, 1'b0, 1'b0, 1'b0, fxadr, fyadr, 32'd0);
 
-Gowin_SDPB_7200x4_mi bitmapRAM (
+Gowin_SDPB_14400x4 bitmapRAM (
         .dout(bdout), //output [3:0] dout
         .clka(XTAL_IN), //input clka
         .cea(bRAMwrite), //input cea

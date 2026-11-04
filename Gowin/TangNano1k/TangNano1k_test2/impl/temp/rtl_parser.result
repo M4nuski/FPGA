@@ -1,15 +1,15 @@
 [
  {
   "InstFile" : "C:/Dropbox/Prog/FPGA/Gowin/TangNano1k/TangNano1k_test2/src/test2.v",
-  "InstLine" : 1,
+  "InstLine" : 5,
   "InstName" : "top",
   "ModuleFile" : "C:/Dropbox/Prog/FPGA/Gowin/TangNano1k/TangNano1k_test2/src/test2.v",
-  "ModuleLine" : 1,
+  "ModuleLine" : 5,
   "ModuleName" : "top",
   "SubInsts" : [
    {
     "InstFile" : "C:/Dropbox/Prog/FPGA/Gowin/TangNano1k/TangNano1k_test2/src/test2.v",
-    "InstLine" : 307,
+    "InstLine" : 315,
     "InstName" : "VGA",
     "ModuleFile" : "C:/Dropbox/Prog/FPGA/Gowin/TangNano1k/TangNano1k_test2/src/VGA_timing.v",
     "ModuleLine" : 1,
@@ -17,7 +17,7 @@
    },
    {
     "InstFile" : "C:/Dropbox/Prog/FPGA/Gowin/TangNano1k/TangNano1k_test2/src/test2.v",
-    "InstLine" : 315,
+    "InstLine" : 323,
     "InstName" : "textRAM",
     "ModuleFile" : "C:/Dropbox/Prog/FPGA/Gowin/TangNano1k/TangNano1k_test2/src/gowin_ram16sdp/gowin_ram16sdp_512x8.v",
     "ModuleLine" : 9,
@@ -25,7 +25,7 @@
    },
    {
     "InstFile" : "C:/Dropbox/Prog/FPGA/Gowin/TangNano1k/TangNano1k_test2/src/test2.v",
-    "InstLine" : 332,
+    "InstLine" : 340,
     "InstName" : "fontROM",
     "ModuleFile" : "C:/Dropbox/Prog/FPGA/Gowin/TangNano1k/TangNano1k_test2/src/gowin_user_flash/gowin_user_flash.v",
     "ModuleLine" : 9,
@@ -33,11 +33,11 @@
    },
    {
     "InstFile" : "C:/Dropbox/Prog/FPGA/Gowin/TangNano1k/TangNano1k_test2/src/test2.v",
-    "InstLine" : 334,
+    "InstLine" : 342,
     "InstName" : "bitmapRAM",
-    "ModuleFile" : "C:/Dropbox/Prog/FPGA/Gowin/TangNano1k/TangNano1k_test2/src/gowin_sdpb/gowin_sdpb_7200x4_mi.v",
+    "ModuleFile" : "C:/Dropbox/Prog/FPGA/Gowin/TangNano1k/TangNano1k_test2/src/gowin_sdpb/gowin_sdpb_14400x4.v",
     "ModuleLine" : 9,
-    "ModuleName" : "Gowin_SDPB_7200x4_mi"
+    "ModuleName" : "Gowin_SDPB_14400x4"
    }
   ]
  }

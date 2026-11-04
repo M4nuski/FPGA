@@ -9,7 +9,6 @@ Running placement......
 [30%] Placement Phase 2 completed
 WARN  (TA1132) :  'XTAL_IN' was determined to be a clock but was not created.
 WARN  (TA1132) :  'LCD_CLK_d' was determined to be a clock but was not created.
-WARN  (TA1132) :  'div3Clock[0]' was determined to be a clock but was not created.
 [50%] Placement Phase 3 completed
 Running routing......
 [60%] Routing Phase 0 completed
@@ -28,5 +27,5 @@ Generate file "C:\Dropbox\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\impl\pnr\T
 Generate file "C:\Dropbox\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\impl\pnr\TangNano1k_test2.rpt.html" completed
 Generate file "C:\Dropbox\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\impl\pnr\TangNano1k_test2.rpt.txt" completed
 Generate file "C:\Dropbox\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\impl\pnr\TangNano1k_test2.tr.html" completed
-Sun Nov  1 21:23:23 2026
+Tue Nov  3 18:20:21 2026
 

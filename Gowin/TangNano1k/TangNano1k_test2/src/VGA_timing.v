@@ -8,23 +8,26 @@ module VGA_timing
     output LCD_VSYNC,
 
     output [9:0] H, //todo switch to 10 bit : max is 1023 (640x480)
-    output [9:0] V
+    output [9:0] V,
+    output [9:0] Hp,
+    output [9:0] Vp
 );
-    parameter H_BackPorch   = 10'd27;// 1 20 50;
+    parameter H_BackPorch   = 10'd2;// 1 27 50;
     parameter H_Pixel_Valid = 10'd480;
-    parameter H_FrontPorch  = 10'd5;// 1  5 10;
+    parameter H_FrontPorch  = 10'd2;// 1  5 10;
     parameter H_Total       = H_Pixel_Valid + H_FrontPorch + H_BackPorch;
 
-    parameter V_BackPorch   = 10'd15;// 1 10 30;    
+    parameter V_BackPorch   = 10'd2;// 1 15 30;    
     parameter V_Lines_Valid = 10'd272; 
-    parameter V_FrontPorch  = 10'd6;// 1  5 10;  
+    parameter V_FrontPorch  = 10'd2;// 1  6 10;  
     parameter V_Total       = V_Lines_Valid + V_FrontPorch + V_BackPorch;
 
     // Horizen pixel count
 
     reg [9:0] H_PixelCount;
     reg [9:0] V_LinesCount;
-
+    assign Hp = H_PixelCount;
+    assign Vp = V_LinesCount;
     assign H = LCD_DE ? (H_PixelCount - H_BackPorch) : 10'd0; // +1 to allow DFF sync through memories
     assign V = LCD_DE ? (V_LinesCount - V_BackPorch) : 10'd0;
 

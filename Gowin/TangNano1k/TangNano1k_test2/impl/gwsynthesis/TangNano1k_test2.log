@@ -1,10 +1,10 @@
 GowinSynthesis start
 Running parser ...
 Analyzing Verilog file 'C:\Dropbox\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\src\VGA_timing.v'
+Analyzing Verilog file 'C:\Dropbox\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\src\gowin_ram16sdp\gowin_ram16sdp_512x8.v'
 Analyzing Verilog file 'C:\Dropbox\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\src\gowin_user_flash\gowin_user_flash.v'
 Analyzing Verilog file 'C:\Dropbox\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\src\test2.v'
-Analyzing Verilog file 'C:\Dropbox\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\src\gowin_sdpb\gowin_sdpb_7200x4_mi.v'
-Analyzing Verilog file 'C:\Dropbox\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\src\gowin_ram16sdp\gowin_ram16sdp_512x8.v'
+Analyzing Verilog file 'C:\Dropbox\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\src\gowin_sdpb\gowin_sdpb_14400x4.v'
 Compiling module 'top'("C:\Dropbox\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\src\test2.v":1)
 Extracting RAM for identifier 'palette'("C:\Dropbox\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\src\test2.v":52)
 WARN  (EX3780) : Using initial value of 'fontColor' since it is never assigned("C:\Dropbox\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\src\test2.v":128)
@@ -14,11 +14,10 @@ WARN  (EX3780) : Using initial value of 'counter' since it is never assigned("C:
 WARN  (EX3780) : Using initial value of 'cursor' since it is never assigned("C:\Dropbox\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\src\test2.v":137)
 WARN  (EX3780) : Using initial value of 'tRAMwrite' since it is never assigned("C:\Dropbox\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\src\test2.v":141)
 WARN  (EX3780) : Using initial value of 'bRAMwrite' since it is never assigned("C:\Dropbox\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\src\test2.v":142)
-WARN  (EX3778) : Edge of vector 'div3Clock' is only sensitive to the least significant bit("C:\Dropbox\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\src\test2.v":259)
 Compiling module 'VGA_timing'("C:\Dropbox\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\src\VGA_timing.v":1)
 Compiling module 'Gowin_RAM16SDP_512x8'("C:\Dropbox\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\src\gowin_ram16sdp\gowin_ram16sdp_512x8.v":9)
 Compiling module 'Gowin_User_Flash'("C:\Dropbox\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\src\gowin_user_flash\gowin_user_flash.v":9)
-Compiling module 'Gowin_SDPB_7200x4_mi'("C:\Dropbox\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\src\gowin_sdpb\gowin_sdpb_7200x4_mi.v":9)
+Compiling module 'Gowin_SDPB_14400x4'("C:\Dropbox\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\src\gowin_sdpb\gowin_sdpb_14400x4.v":9)
 WARN  (EX1998) : Net 'currentData[7]' does not have a driver("C:\Dropbox\Prog\FPGA\Gowin\TangNano1k\TangNano1k_test2\src\test2.v":139)
 NOTE  (EX0101) : Current top module is "top"
 [5%] Running netlist conversion ...
