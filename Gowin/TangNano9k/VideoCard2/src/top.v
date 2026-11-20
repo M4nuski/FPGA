@@ -1,6 +1,5 @@
 `default_nettype wire
 
-
 // Hybrid mode video card 
 // VGA 640x480 / HD 1280x720
 
@@ -58,7 +57,7 @@ Gowin_rPLL_74p25 pll_27_74( // 27MHz to 74.25MHz
 
 wire pllLocked = lock74 & lock126;
 reg videoMode = 0; // 0:VGA, 1:HD
-wire clockSource = videoMode ? clock74 : clock25;
+wire videoClock = videoMode ? clock74 : clock25;
 
 wire clk1 = clock25;
 reg clk2, clk4, clk5, clk8; // Divided pixel clocks
@@ -67,7 +66,7 @@ reg clk4_count = 0;
 reg [2:0] clk5_count = 0;
 reg [1:0] clk8_count = 0;
 
-always @(posedge clockSource or posedge VSYNC) begin
+always @(posedge videoClock or posedge VSYNC) begin
     if (VSYNC) begin
     clk2 <= 0;
     clk4 <= 0;
@@ -76,7 +75,7 @@ always @(posedge clockSource or posedge VSYNC) begin
     clk5_count <= 3'd2;
     clk8 <= 0;
     clk8_count <= 2'd3;
-    end else begin
+    end else if (DE) begin
 
         clk2 <= ~clk2;
 
@@ -99,6 +98,27 @@ always @(posedge clockSource or posedge VSYNC) begin
         end else clk8_count <= clk8_count + 2'd1;
     end
 end
+
+//mode0 resolutions
+//00 640x480 4:3  div 1 80x60 / 80x30  - 4800 chars
+//01 320x240 4:3  div 2 40x30 / 40x15  - 76800 pixels/frame
+//10 160x120 4:3  div 4 20x15 / 20x7.5 - 19200 pixels/frame x3 buffers = 57600 bytes (28800 in 4 bpp)
+//11 128x96  4:3  div 5 16x12 / 16x6   - 12288 pixels/frame x3 buffers = 36864 bytes (18432 in 4 bpp)
+
+//mode1 resolutions 
+//00 640x360 16:9 div 2 80x45 / 80x22.5
+//01 320x180 16:9 div 4 40x22.5 / 40x11.25  - 57600 pixels/frame
+//10 256x144 16:9 div 5 32x18 / 32x9        - 36864 pixels/frame x3 buffers = 110592 bytes (55296 in 4bpp)
+//11 160x90  16:9 div 8 20x11.25 / 20x5.625 - 14400 pixels/frame x3 buffers =  43200 bytes (21600 in 4bpp)
+
+wire [4:0] clockTree = {clk8, clk5, clk4, clk2, clk1};
+
+reg  [1:0] textResolution = 2'b0;
+reg        bitmapResolution = 0;
+wire [1:0] expBitmapResolution = {1'b1, bitmapResolution};
+
+wire textPixelClock   = videoMode ? clockTree[     textResolution+1] : clockTree[     textResolution];
+wire bitmapPixelClock = videoMode ? clockTree[expBitmapResolution+1] : clockTree[expBitmapResolution];
 
 
 // Video Timing
@@ -127,52 +147,50 @@ wire VSYNC = videoMode ? VSYNC_720 : VSYNC_480;
 // Video pipeline and compositon
 
 
-reg SYNC_H_reg1, SYNC_H_reg2;
-reg SYNC_V_reg1, SYNC_V_reg2;
+reg fontBit = 0;
+wire [15:0] RGB_out = fontBit ? fontColor : bitmapColor;
 
-reg [4:0] RGB_R, RGB_R_reg1, RGB_R_reg2;
-reg [5:0] RGB_G, RGB_G_reg1, RGB_G_reg2;
-reg [4:0] RGB_B, RGB_B_reg1, RGB_B_reg2;
+reg SYNC_H_delay1, SYNC_H_delay2;
+reg SYNC_V_delay1, SYNC_V_delay2;
+reg DE_out, DE_delay1, DE_delay2;
 
-always @(posedge clockSource) begin
-    SYNC_H_out  <= SYNC_H_reg2;
-    SYNC_H_reg2 <= SYNC_H_reg1;
-    SYNC_H_reg1 <= HSYNC;
+always @(posedge videoClock) begin
+    SYNC_H_out    <= SYNC_H_delay2;
+    SYNC_H_delay2 <= SYNC_H_delay1;
+    SYNC_H_delay1 <= HSYNC;
 
-    SYNC_V_out  <= SYNC_V_reg2;
-    SYNC_V_reg2 <= SYNC_V_reg1;
-    SYNC_V_reg1 <= VSYNC;
+    SYNC_V_out    <= SYNC_V_delay2;
+    SYNC_V_delay2 <= SYNC_V_delay1;
+    SYNC_V_delay1 <= VSYNC;
 
-    RGB_R_out <= RGB_R_reg2;
-    RGB_G_out <= RGB_G_reg2;
-    RGB_B_out <= RGB_B_reg2;
+    DE_out    <= DE_delay2;
+    DE_delay2 <= DE_delay1;
+    DE_delay1 <= DE;
 
-    RGB_R_reg2 <= RGB_R_reg1;
-    RGB_G_reg2 <= RGB_G_reg1;
-    RGB_B_reg2 <= RGB_B_reg1;
+    RGB_R_out <= DE_out ? RGB_out[ 4: 0] : 5'd0;
+    RGB_G_out <= DE_out ? RGB_out[10: 5] : 6'd0;
+    RGB_B_out <= DE_out ? RGB_out[15:11] : 5'd0;
 
-    RGB_R_reg1 <= RGB_R;
-    RGB_G_reg1 <= RGB_G;
-    RGB_B_reg1 <= RGB_B;
 end
 
 
 // Test
 
-
-// 307200 100 1011 0000 0000 0000
+// 1280x720 = 921600 = 1110 0001 0000 0000 0000
+// 640x480 = 307200 =   100 1011 0000 0000 0000
 reg [19:0] pixel;
 reg [10:0] column;
 reg [10:0] row;
 
 wire [10:0] columnLast = videoMode ? 11'd1279 : 11'd639;
 wire [10:0] rowLast = videoMode ? 11'd719 : 11'd479;
-wire testclock = clockSource; // videoMode ? clk2 : clk1;
-wire testchecker = column[4] ^ row[4];
+
+wire test_checker = column[4] ^ row[4];
 wire test_R = ((column == 0) | (column == columnLast));
 wire test_G = ((row[9:0] == rowLast[10:1]) | (column[9:0] == columnLast[10:1]));
 wire test_B = ((row == 0) | (row == rowLast));
-wire test_RGB_underlay = testchecker & ~(test_R | test_G | test_B);
+wire test_RGB_underlay = test_checker & ~(test_R | test_G | test_B);
+reg [15:0] RGB_delay1, RGB_delay2;
 
 reg [23:0] vcount = 0;
 always @(posedge XTAL_IN) begin
@@ -181,26 +199,20 @@ always @(posedge XTAL_IN) begin
     vcount <= vcount + 24'd1;
 end
 
-
-
-always @(posedge testclock or negedge VSYNC) begin
+always @(posedge videoClock) begin
     if (~VSYNC) begin
         pixel <= 0;
-        //RGB_R <= 5'b0;
-        //RGB_G <= 6'b0;
-        //RGB_B <= 5'b0;
         column <= 0;
         row <= 0;
-    end else if (~DE) begin
-        RGB_R <= 5'b0;
-        RGB_G <= 6'b0;
-        RGB_B <= 5'b0;
-    end else begin
+   // end else if (~DE) begin
+       // RGB_delay1 <= 16'd0;
+    end else if (DE) begin
+
         pixel <= pixel + 20'b1;
 
-        RGB_R <= (test_RGB_underlay | test_R) ?  5'b11111 : 0;
-        RGB_G <= (test_RGB_underlay | test_G) ? 6'b111111 : 0;
-        RGB_B <= (test_RGB_underlay | test_B) ?  5'b11111 : 0;
+        RGB_delay1[ 4: 0] <= (test_RGB_underlay | test_R) ?  5'b11111 : 0;
+        RGB_delay1[10: 5] <= (test_RGB_underlay | test_G) ? 6'b111111 : 0;
+        RGB_delay1[15:11] <= (test_RGB_underlay | test_B) ?  5'b11111 : 0;
           
         if (column == columnLast) begin
             column <= 0;
@@ -211,16 +223,34 @@ always @(posedge testclock or negedge VSYNC) begin
         end
     end
 
+    RGB_delay2 <= RGB_delay1;
+    bitmapColor <= RGB_delay2;   
 end
+
 
 // CPU8 interface
 
 
-// Text mode
+// Text generator
+reg fontMode = 0; // 8x8, 1:8x16
+reg [15:0] fontColor = 16'b0111101111101111;
 
+// 8x8 / 8x16
+// cursorX cursorY cursor 
+// font ROM
+// char RAM
+// 
+// RGB_x_out <= FontBit ? FontColor : BitmapColor
+// FontBit <= fontROM[char][fontOffset]
+// wire fontOffset 
+// char <= charRAM[textOffset] 
+// textOffset <= pixel[19:3]??
 
 // Bitmap mode
 
-
+reg [15:0] bitmapColor = 16'd0;
+//BitmapColor <= palette[colorIndex]
+//colorIndex <= bitmapRAM[pixelOffset] // ram fetch from address on clock up, inverting clock to fetch between latches
+// pixelOffset <= pixel // pixel updated on clock up
 
 endmodule

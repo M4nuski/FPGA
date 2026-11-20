@@ -11,4 +11,4 @@ create_clock -name clk74 -period 13.468 -waveform {0 6.734} [get_nets {clock74}]
 //create_clock -name video_hcount0 -period 26.936 -waveform {0 13.468} [get_nets {video_HD/H_Count[0]}]
 
 //create_clock -name pixel0 -period 26.936 -waveform {0 13.468} [get_nets {pixel[0]}]
-create_clock -name clockSource -period 26.936 -waveform {0 13.468} [get_nets {clockSource}]
+//create_clock -name clockSource -period 26.936 -waveform {0 13.468} [get_nets {clockSource}]

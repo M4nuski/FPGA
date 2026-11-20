@@ -4,7 +4,7 @@ module video_timing_480DMT (
     input PixelClk,
     input Resetn,
 
-    output DE,
+    output reg DE,
     output reg HSYNC,
     output reg VSYNC
 );
@@ -31,19 +31,19 @@ module video_timing_480DMT (
     wire V_DE  = (V_Count >= (V_Sync + V_BackPorch)) & (V_Count < (V_Sync + V_BackPorch + V_Valid));
     //assign Line  = DE ? (V_Count - (V_Sync + V_BackPorch)) : 10'd0;
 
-    assign DE = H_DE && V_DE;
-
     always @( posedge PixelClk or negedge Resetn ) begin
         if (!Resetn) begin
             H_Count <= 10'b0;
             V_Count <= 10'b0;
             VSYNC <= V_Idle;
             HSYNC <= H_Idle;
+            DE <= 0;
         end else begin
             H_Count <= ( H_Count != H_Total ) ? H_Count + 10'b1 : 10'b0;
             V_Count <= ( H_Count != H_Total ) ? V_Count : (( V_Count != V_Total ) ? V_Count + 10'b1 : 10'b0);       
             VSYNC <= (V_Count < V_Sync) ? ~V_Idle : V_Idle;
             HSYNC <= (H_Count < H_Sync) ? ~H_Idle : H_Idle;
+            DE <= H_DE & V_DE;
         end
     end
 
@@ -57,7 +57,7 @@ module video_timing_720DMT (
     input PixelClk,
     input Resetn,
 
-    output DE,
+    output reg DE,
     output reg HSYNC,
     output reg VSYNC
 );
@@ -84,19 +84,19 @@ module video_timing_720DMT (
     wire V_DE  = (V_Count >= (V_Sync + V_BackPorch)) & (V_Count < (V_Sync + V_BackPorch + V_Valid));
     //assign Line  = DE ? (V_Count - (V_Sync + V_BackPorch))>>1 : 10'd0;
 
-    assign DE = H_DE && V_DE;
-
     always @( posedge PixelClk or negedge Resetn ) begin
         if (!Resetn) begin
             H_Count <= 11'b0;
             V_Count <= 10'b0;
             VSYNC <= V_Idle;
             HSYNC <= H_Idle;
+            DE <= 0;
         end else begin
             H_Count <= ( H_Count != H_Total ) ? H_Count + 11'b1 : 10'b0;
             V_Count <= ( H_Count != H_Total ) ? V_Count : (( V_Count != V_Total ) ? V_Count + 10'b1 : 10'b0);       
             VSYNC <= (V_Count < V_Sync) ? ~V_Idle : V_Idle;
             HSYNC <= (H_Count < H_Sync) ? ~H_Idle : H_Idle;
+            DE <= H_DE & V_DE;
         end
     end
 
