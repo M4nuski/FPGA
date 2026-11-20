@@ -1,0 +1,7 @@
+{
+    "name": "Port_counter",
+    "includedFiles": "all",
+    "testBenches": "all",
+    "synthGowinOptions": ["-abc9"],
+    "board": "tangnano9k"
+}

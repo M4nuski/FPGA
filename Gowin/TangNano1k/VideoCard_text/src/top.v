@@ -1,7 +1,7 @@
 // Text mode video card 
 // RGB565 480x272 pixel output
 // 8x8 CGA font
-// CPU8 interface
+// CPU8 interface v2
 
 // 480 * 272 pixels
 // text layer, bin 2
@@ -22,30 +22,42 @@ module top
 	output [4:0] LCD_B,
 
 	input WRn,
-    input [2:0] address,
+    input address,
     input [7:0] data
-);
+); 
+// v1: 11 wires, 222/1152 LE
+// D7-D0
+// A1-A0
+// WRn
 
+// v2: 10 wire, 315/1152 LE
+// D7-D0
+// WRn A0
+
+// 8 wire interface?
+//  D3 D2 D1 D0
+// WRn HN A1 A0
+
+// V2
+// Address 0 Data: Write Char data, increase cursor
+
+// Address 1 Commands:
+// 00dd dddd Cursor X
+// 01dd dddd Cursor Y
+
+// 1000 xxxB Cursor Blink on/off
+// 1001 dddd font color R nibble 
+// 1010 dddd font color G nibble 
+// 1011 dddd font color B nibble 
+
+// 1100 xxHC Home cursor, Clear Screen
+// 1101 dddd back color R nibble
+// 1110 dddd back color G nibble
+// 1111 dddd back color B nibble
 
 // interface
 reg [7:0] dataBuffer;
-reg [2:0] addressBuffer;
-
-// Address 0 Write char, advance cursor
-// Address 1 Write char, advance cursor
-// Address 2 Command
-//           0 Home cursor
-//           1 Clear Screen, home cursor
-//           2 Set argument as cursor X
-//           3 Set argument as cursor Y
-//           4 Set argument as font color high byte
-//           4 Set argument as font color low byte
-//           4 Set argument as back color high byte
-//           4 Set argument as back color low byte
-//           8 Blink On
-//           9 Blink Off
-// Address 3 Argument
-
+reg addressBuffer;
 
 // 16 bits 565 RGB         RRRRRGGGGGGBBBBB
 reg [15:0] fontColor = 16'b0111101111101111;
@@ -55,9 +67,9 @@ reg [22:0] blinkerCounter = 0;
 reg blink = 1;
 
 reg Reset = 1;
-reg [8:0] counter = 0; // 0-511
+reg [8:0] counter = 9'd511; // 0-511
 wire CLS = counter != 9'd511;
-reg [8:0] cursor = 8*30;
+reg [8:0] cursor = 0;
 reg [2:0] WR = 3'b111;
 reg [7:0] currentData;
 reg [7:0] command;
@@ -93,48 +105,46 @@ always @(posedge XTAL_IN) begin
 	// address commands and data
 	if (WR == 3'b011) begin
 		case (addressBuffer)
-			2'd0: begin // write and advance cursor
+			1'd0: begin // data
 				currentData <= dataBuffer;
 				cursor <= cursor + 9'd1;
 				tRAMwrite <= 1;
 			end
-			2'd1: begin // write and advance cursor
-				currentData <= dataBuffer;
-				cursor <= cursor + 9'd1;
-				tRAMwrite <= 1;
-			end
-			2'd2: begin // command
-				case (dataBuffer)
-					0 : cursor <= 9'd0; // home
-					1 : begin           // CLS
-						counter <= 9'd0;
-						cursor <= 9'd0;
-					end
-					8 : blink <= 1;
-					9 : blink <= 0;
-					default: command <= dataBuffer;
-				endcase
-			end
-			2'd3: begin // command argument
-				case (command)
-					2 : cursor <= dataBuffer + (cursorY << 5) - (cursorY << 1);
-					3 : cursor <= cursorX + (dataBuffer << 5) - (dataBuffer << 1);	
-					4 : fontColor[15:8] <= dataBuffer;
-					5 : fontColor[7:0] <= dataBuffer;
-					6 : backColor[15:8] <= dataBuffer;
-					7 : backColor[7:0] <= dataBuffer;
-				endcase
-			end 
-		endcase
-	end
-end
+			1'd1: begin // command
+                if (dataBuffer[7:6] == 2'b00) begin // set X
+                    cursor <= dataBuffer[5:0] + (cursorY << 5) - (cursorY << 1);
+                end else if (dataBuffer[7:6] == 2'b01) begin // set Y
+                    cursor <= cursorX + (dataBuffer[5:0] << 5) - (dataBuffer[5:0] << 1);	
+                end else case (dataBuffer[7:4])
+                    // 1000 xxxB Cursor Blink on/off
+                    4'b1000: blink <= dataBuffer[0]; 
+                    4'b1001: fontColor[15:11] <= {dataBuffer[3:0], dataBuffer[0]};
+                    4'b1010: fontColor[10:5] <= {dataBuffer[3:0], dataBuffer[0], dataBuffer[0]};   
+                    4'b1011: fontColor[4:0] <= {dataBuffer[3:0], dataBuffer[0]};    
+                    // 1100 xxHC Home cursor, Clear Screen
+                    4'b1100: begin
+                        if (dataBuffer[0]) begin
+                            counter <= 9'd0;
+                            currentData <= 0;
+                        end
+                        if (dataBuffer[1]) cursor <= 9'd0;
+                    end
+                    4'b1101: backColor[15:11] <= {dataBuffer[3:0], dataBuffer[0]};
+                    4'b1110: backColor[10:5] <= {dataBuffer[3:0], dataBuffer[0], dataBuffer[0]};   
+                    4'b1111: backColor[4:0] <= {dataBuffer[3:0], dataBuffer[0]};          
+                endcase // command
+			end // Address == 1 
+        endcase // address
+    end // write
+end // clk
+
 
 wire [6:0] cursorX = cursor % 7'd30;
 wire [6:0] cursorY = (cursor / 7'd30);
 wire [8:0] voffset = (v[8:4] << 5) - (v[8:4] << 1); // x30
 assign tadb = ph[8:4] + voffset; // char ram address to read
 assign tada = (CLS) ? (counter - 9'd1) : (cursor - 9'd1); // char ram address to write
-assign tdin = (CLS) ? ((Reset == 1) ? (counter[7:0] + 8'h21) : 0) : currentData; // char ram data to write
+assign tdin = (CLS) ? 0 : currentData; // char ram data to write
 
 // fetch font data
 wire [31:0] fdout;
@@ -168,7 +178,7 @@ RGB565_timing videoGen(
 //        .di(tdin), //input [7:0] di
 //        .rad(tadb), //input [8:0] rad
 //        .clk(XTAL_IN) //input clk
-//    );
+//    ); changed back to dpbsram to regain a few hundred LE
 
 Gowin_SDPB textRAM(tdout, XTAL_IN, tRAMwrite, 1'b0, ~XTAL_IN, 1'b1, 1'b0, 1'b1, tada, tdin, tadb);
 

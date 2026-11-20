@@ -1,0 +1,14 @@
+ {
+    "name": "HDMI_2",
+    "includedFiles": ["src/top.v", "src/gowin_clkdiv/gowin_clkdiv.v", "src/gowin_rpll/gowin_rpll.v"],
+    "externalFlashFiles": [],
+    "top": "top",
+    "constraintsFile": "src/hdmi.cst",
+    "programMode":"ram",
+    "testBenches": "all",
+    "nextPnrGowinOptions": [],
+    "synthGowinOptions": [],
+    "baudRate": 115200,
+    "board": "tangnano9k",
+    "skipCstChecking": false
+}
