@@ -6,16 +6,19 @@ module video_timing_480DMT (
 
     output reg DE,
     output reg HSYNC,
-    output reg VSYNC
+    output reg VSYNC,
+    output HPOL,
+    output VPOL
 );
-    parameter H_Idle        = 1'b1;     // neg
+    assign HPOL = 1'b1; // neg
+    assign VPOL = 1'b1; // neg
+
     parameter H_Sync        = 10'd96;
     parameter H_BackPorch   = 10'd48;   // 40BackPorch + 8LeftBlank
     parameter H_Valid       = 10'd640;
     parameter H_FrontPorch  = 10'd16;   // 8RightBlank + 8FrontPorch
     parameter H_Total       = H_Sync + H_BackPorch + H_Valid + H_FrontPorch - 10'd1; // 800-1
 
-    parameter V_Idle        = 1'b1;     // neg
     parameter V_Sync        = 10'd2;
     parameter V_BackPorch   = 10'd33;   // 25BackPorch + 8TopBlank
     parameter V_Valid       = 10'd480; 
@@ -35,14 +38,14 @@ module video_timing_480DMT (
         if (!Resetn) begin
             H_Count <= 10'b0;
             V_Count <= 10'b0;
-            VSYNC <= V_Idle;
-            HSYNC <= H_Idle;
+            VSYNC <= 0;
+            HSYNC <= 0;
             DE <= 0;
         end else begin
             H_Count <= ( H_Count != H_Total ) ? H_Count + 10'b1 : 10'b0;
             V_Count <= ( H_Count != H_Total ) ? V_Count : (( V_Count != V_Total ) ? V_Count + 10'b1 : 10'b0);       
-            VSYNC <= (V_Count < V_Sync) ? ~V_Idle : V_Idle;
-            HSYNC <= (H_Count < H_Sync) ? ~H_Idle : H_Idle;
+            VSYNC <= (V_Count < V_Sync);
+            HSYNC <= (H_Count < H_Sync);
             DE <= H_DE & V_DE;
         end
     end
@@ -59,16 +62,19 @@ module video_timing_720DMT (
 
     output reg DE,
     output reg HSYNC,
-    output reg VSYNC
+    output reg VSYNC,
+    output HPOL, 
+    output VPOL
 );
-    parameter H_Idle        = 1'b0;     // pos
+    assign HPOL = 1'b0; // pos
+    assign VPOL = 1'b1; // neg
+
     parameter H_Sync        = 11'd40;
     parameter H_BackPorch   = 11'd220;   // BackPorch + LeftBlank
     parameter H_Valid       = 11'd1280;
     parameter H_FrontPorch  = 11'd110;   // RightBlank + FrontPorch
     parameter H_Total       = H_Sync + H_BackPorch + H_Valid + H_FrontPorch - 10'd1;
 
-    parameter V_Idle        = 1'b1;     // neg
     parameter V_Sync        = 10'd5;
     parameter V_BackPorch   = 10'd20;   // BackPorch + TopBlank
     parameter V_Valid       = 10'd720; 
@@ -88,14 +94,14 @@ module video_timing_720DMT (
         if (!Resetn) begin
             H_Count <= 11'b0;
             V_Count <= 10'b0;
-            VSYNC <= V_Idle;
-            HSYNC <= H_Idle;
+            VSYNC <= 0;
+            HSYNC <= 0;
             DE <= 0;
         end else begin
             H_Count <= ( H_Count != H_Total ) ? H_Count + 11'b1 : 10'b0;
             V_Count <= ( H_Count != H_Total ) ? V_Count : (( V_Count != V_Total ) ? V_Count + 10'b1 : 10'b0);       
-            VSYNC <= (V_Count < V_Sync) ? ~V_Idle : V_Idle;
-            HSYNC <= (H_Count < H_Sync) ? ~H_Idle : H_Idle;
+            VSYNC <= (V_Count < V_Sync);
+            HSYNC <= (H_Count < H_Sync);
             DE <= H_DE & V_DE;
         end
     end

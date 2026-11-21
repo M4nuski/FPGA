@@ -9,6 +9,7 @@
         <File path="src/gowin_clkdiv/gowin_clkdiv.v" type="file.verilog" enable="1"/>
         <File path="src/gowin_rpll/gowin_rpll_126.v" type="file.verilog" enable="1"/>
         <File path="src/gowin_rpll/gowin_rpll_74p25.v" type="file.verilog" enable="1"/>
+        <File path="src/gowin_user_flash/gowin_user_flash.v" type="file.verilog" enable="1"/>
         <File path="src/top.v" type="file.verilog" enable="1"/>
         <File path="src/pinout.cst" type="file.cst" enable="1"/>
         <File path="src/VideoCard2.sdc" type="file.sdc" enable="1"/>
