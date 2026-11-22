@@ -8,7 +8,9 @@ module video_timing_480DMT (
     output reg HSYNC,
     output reg VSYNC,
     output HPOL,
-    output VPOL
+    output VPOL,
+    output reg first,
+    output reg last
 );
     assign HPOL = 1'b1; // neg
     assign VPOL = 1'b1; // neg
@@ -34,6 +36,8 @@ module video_timing_480DMT (
     wire V_DE  = (V_Count >= (V_Sync + V_BackPorch)) & (V_Count < (V_Sync + V_BackPorch + V_Valid));
     //assign Line  = DE ? (V_Count - (V_Sync + V_BackPorch)) : 10'd0;
 
+  //  assign DE = H_DE & V_DE;
+
     always @( posedge PixelClk or negedge Resetn ) begin
         if (!Resetn) begin
             H_Count <= 10'b0;
@@ -47,6 +51,8 @@ module video_timing_480DMT (
             VSYNC <= (V_Count < V_Sync);
             HSYNC <= (H_Count < H_Sync);
             DE <= H_DE & V_DE;
+            first <= (H_Count == (H_Sync + H_BackPorch)); // Sync 2 BP 2, first is 4:  0 1   2 3
+            last <= (H_Count == (H_Sync + H_BackPorch + H_Valid - 1)); // sync2 bp2 valid2 last is 5: 0 1  2 3  4 5
         end
     end
 
