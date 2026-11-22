@@ -30,7 +30,8 @@ module top
 
     // debug
     output reg led,
-    input mode // default VGA, push btn 1 for HD
+    input mode, // default VGA, push btn 1 for HD
+    input res
 );
 
 
@@ -55,15 +56,25 @@ Gowin_rPLL_74p25 pll_27_74( // 27MHz to 74.25MHz
     .clkin(XTAL_IN) //input clkin
 );
 
+//Gowin_CLKDIV2 div_74_37(
+//    .clkout(clock37), //output clkout
+//    .hclkin(clock74), //input hclkin
+//    .resetn(lock74) //input resetn
+//);
+
 wire pllLocked = lock74 & lock126;
 reg videoMode = 0; // 0:VGA, 1:HD
+
+reg clock37 = 0;
+always @(posedge clock74) clock37 <= ~clock37;
+
 wire videoClock = videoMode ? clock74 : clock25;
-
-
+wire pixelClock = videoMode ? clock37 : clock25;
+wire romClock = videoMode ? ~pixelClock : pixelClock;
 // Clock and X/Y dividers 
 
-wire clk1 = videoClock;
-reg clk2;
+//wire clk1 = videoClock;
+
 
 // max is 1024x1024
 reg [9:0] x = 0;
@@ -86,43 +97,24 @@ reg [1:0] y4_count;
 reg [2:0] y5_count;
 reg [2:0] y8_count;
 
-reg hsyncDone = 0;
-always @(posedge videoClock) begin
-    clk2 <= ~clk2;
-
+// Vertical pixel counters
+reg V_DEdelay;
+always @(posedge HSYNC) begin
+    V_DEdelay <= V_DE;
     if (VSYNC) begin
-        x  <= 0;
+
         y  <= 0;
-        x2 <= 0;
         y2 <= 0;
-        x2_count <= 0;
         y2_count <= 0;
-        x4 <= 0;
         y4 <= 0;
-        x4_count <= 0;
         y4_count <= 0;
-        x5 <= 0;
         y5 <= 0;
-        x5_count <= 0;
         y5_count <= 0;
-        x8 <= 0;
         y8 <= 0;
-        x8_count <= 0;
         y8_count <= 0;
 
-    end else if (HSYNC & !hsyncDone) begin
-        hsyncDone <= 1;
-
-         x <= 0;
-        x2 <= 0;
-        x2_count <= 0;
-        x4 <= 0;
-        x4_count <= 0;
-        x5 <= 0;
-        x5_count <= 0;
-        x8 <= 0;
-        x8_count <= 0;
-
+    end else if (V_DEdelay) begin
+        
         y <= y + 10'd1;
 
         if (y2_count == 1) begin
@@ -144,9 +136,24 @@ always @(posedge videoClock) begin
             y8 <= y8 + 10'd1;
             y8_count <= 0;
         end else y8_count <= y8_count + 3'd1;
+    end
+end
 
-    end else if (DE) begin
-       hsyncDone <= 0;
+// Horizontal pixel counters
+always @(posedge videoClock) begin
+    if (HSYNC) begin
+
+        x  <= 0; 
+        x2 <= 0;      
+        x2_count <= 0;    
+        x4 <= 0;      
+        x4_count <= 0; 
+        x5 <= 0;      
+        x5_count <= 0;  
+        x8 <= 0;       
+        x8_count <= 0; 
+
+    end else if (H_DE) begin
 
         x  <= x + 10'd1;
 
@@ -169,8 +176,10 @@ always @(posedge videoClock) begin
             x8 <= x8 + 10'd1;
             x8_count <= 0;
         end else x8_count <= x8_count + 3'd1;
+
     end
 end
+
 
 //mode0 resolutions
 //00 640x480 4:3  div 1 80x60 / 80x30  - 4800 chars
@@ -188,9 +197,7 @@ end
 // Clocks and X/Y positions selectors
 
 
-wire pixelClock = videoMode ? clk2 : clk1;
-
-reg  [1:0] textResolution = 2'b0;
+wire  [1:0] textResolution = {1'b0, ~res};//2'b0;
 reg        bitmapResolution = 0;
 wire [1:0] expBitmapResolution = {1'b1, bitmapResolution};
 
@@ -223,7 +230,9 @@ video_timing_480DMT video_VGA(
     HSYNC_480,
     VSYNC_480,
     HPOL_480,
-    VPOL_480, firstPixel, lastPixel
+    VPOL_480, 
+    H_DE_480,
+    V_DE_480
 );
 video_timing_720DMT video_HD (
     clock74,
@@ -232,7 +241,9 @@ video_timing_720DMT video_HD (
     HSYNC_720,
     VSYNC_720,
     HPOL_720,
-    VPOL_720
+    VPOL_720, 
+    H_DE_720,
+    V_DE_720
 );
 
 wire DE    = videoMode ? DE_720    : DE_480;
@@ -240,7 +251,8 @@ wire HSYNC = videoMode ? HSYNC_720 : HSYNC_480;
 wire VSYNC = videoMode ? VSYNC_720 : VSYNC_480;
 wire HPOL  = videoMode ? HPOL_720  : HPOL_480;
 wire VPOL  = videoMode ? VPOL_720  : VPOL_480;
-
+wire H_DE  = videoMode ? H_DE_720  : H_DE_480;
+wire V_DE  = videoMode ? V_DE_720  : V_DE_480;
 
 // Video compositon
 
@@ -258,7 +270,7 @@ reg SYNC_H_delay1, SYNC_H_delay2;
 reg SYNC_V_delay1, SYNC_V_delay2;
 reg DE_out, DE_delay1, DE_delay2, DE_delay3;
 
-reg fP1, lP1, fP2, lP2;
+//reg fP1, lP1, fP2, lP2;
 
 always @(posedge pixelClock) begin
     SYNC_H_out    <= SYNC_H_delay2;
@@ -269,23 +281,23 @@ always @(posedge pixelClock) begin
     SYNC_V_delay2 <= SYNC_V_delay1;
     SYNC_V_delay1 <= VSYNC ^ VPOL; // apply sync polarity
     
-    DE_out    <= DE_delay3;
-    DE_delay3 <= DE_delay2;
+    DE_out    <= DE_delay2;
+   // DE_delay3 <= DE_delay2;
     DE_delay2 <= DE_delay1;
     DE_delay1 <= DE;
 
 //    RGB_R_out <= DE_out ? RGB_out[ 4: 0] : 5'd0; // apply blanking
 //    RGB_G_out <= DE_out ? RGB_out[10: 5] : 6'd0;
 //    RGB_B_out <= DE_out ? RGB_out[15:11] : 5'd0;
-    RGB_B_out <= !DE_out ? 5'd0 : (lP2 ? 5'b11111 : RGB_out[ 4: 0]);
-    RGB_G_out <= !DE_out ? 6'd0 : ((lP2 | fP2) ? 6'b111111 : RGB_out[10: 5]);
-    RGB_R_out <= !DE_out ? 5'd0 : (fP2 ? 5'b11111 : RGB_out[15:11]);
+    RGB_B_out <= !DE_out ? 5'd0 : RGB_out[ 4: 0];
+    RGB_G_out <= !DE_out ? 6'd0 : RGB_out[10: 5];
+    RGB_R_out <= !DE_out ? 5'd0 : RGB_out[15:11];
 
-    
-    lP2 <= lP1;
-    lP1 <= lastPixel;
-    fP2 <= fP1;
-    fP1 <= firstPixel;
+//    
+//    lP2 <= lP1;
+//    lP1 <= lastPixel;
+//    fP2 <= fP1;
+//    fP1 <= firstPixel;
 end
 
 
@@ -310,7 +322,7 @@ always @(posedge XTAL_IN) begin
     vcount <= vcount + 24'd1;
 end
 
-always @(posedge videoClock) begin
+always @(posedge pixelClock) begin
     RGB_delay1[ 4: 0] <= (test_RGB_underlay | test_R) ?  5'b11111 : 0;
     RGB_delay1[10: 5] <= (test_RGB_underlay | test_G) ? 6'b111111 : 0;
     RGB_delay1[15:11] <= (test_RGB_underlay | test_B) ?  5'b11111 : 0;
@@ -350,14 +362,14 @@ reg [0:63] font = 64'b1000100001000001101000000001000110001000000001011000001000
 //00000101
 //10000010
 //00010001
-wire [13:0] calculatedAddress = {charIndex, 6'd0} + {11'd0, x[2:0]} + {8'd0, y[2:0], 3'd0};
-reg bitDelay3, bitDelay2, bitDelay1;
+wire [13:0] calculatedAddress = {charIndex, 6'd0} + {11'd0, textX[2:0]} + {8'd0, textY[2:0], 3'd0};
+//reg bitDelay3, bitDelay2, bitDelay1;
 always @(posedge pixelClock) begin    
-    charIndex <= x[9:3] + (y[6:3]*80);
+    charIndex <= textX[9:3] + (textY[6:3]*8'd80);
     fontAddress <= calculatedAddress;
     fontBitAddress <= ~fontAddress[4:0];
-    bitDelay1 <= videoMode ? 0 : fontDataOut[fontBitAddress]; // select 1 of 32 bits
-    fontBit <= bitDelay1;
+    fontBit <= fontDataOut[fontBitAddress]; // select 1 of 32 bits
+   // fontBit <= bitDelay1;
 end
 
 // font ROM address calculations
@@ -368,7 +380,7 @@ Gowin_User_Flash fontROM(
     .dout(fontDataOut), //output [31:0] dout
     .xe(1'b1), //input xe
     .ye(1'b1), //input ye
-    .se(pixelClock), //input se
+    .se(romClock), //input se
     .prog(1'b0), //input prog
     .erase(1'b0), //input erase
     .nvstr(1'b0), //input nvstr
