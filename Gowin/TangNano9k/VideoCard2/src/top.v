@@ -1,11 +1,11 @@
 `default_nettype wire
 
 // Hybrid mode video card 
-// VGA 640x480 / HD 1280x720
+// VGA 640x480 / HD 1280x720 (div to at most 640x360)
 
 // CPU8 interface
 
-// 3 stage pipeline
+// 3 step pipeline
 
 // Text Mode
 // Bitmap Mode
@@ -15,7 +15,7 @@ module top
     // clock
     input XTAL_IN, // 27Mhz
 
-    // VGA with RGB565 colors
+    // VGA signals with RGB565 colors
     output reg [4:0] RGB_R_out,
     output reg [5:0] RGB_G_out,
     output reg [4:0] RGB_B_out,
@@ -30,8 +30,10 @@ module top
 
     // debug
     output reg led,
-    input mode, // default VGA, push btn 1 for HD
-    input res
+    input vmode, // VGA / HD
+    input bres, // bitmap res
+    input [1:0] tres, // text res
+    input tsize // text size
 );
 
 
@@ -65,15 +67,19 @@ Gowin_rPLL_74p25 pll_27_74( // 27MHz to 74.25MHz
 wire pllLocked = lock74 & lock126;
 reg videoMode = 0; // 0:VGA, 1:HD
 
-reg clock37 = 0;
+reg clock37 = 0; // divide 74.25MHz to 37.125MHz 
 always @(posedge clock74) clock37 <= ~clock37;
+
+
+// Clock selection
+
 
 wire videoClock = videoMode ? clock74 : clock25;
 wire pixelClock = videoMode ? clock37 : clock25;
 wire romClock = videoMode ? ~pixelClock : pixelClock;
-// Clock and X/Y dividers 
 
-//wire clk1 = videoClock;
+
+// X/Y position generation
 
 
 // max is 1024x1024
@@ -194,30 +200,30 @@ end
 //11 160x90  16:9 div 8 20x11.25 / 20x5.625 - 14400 pixels/frame x3 buffers =  43200 bytes (21600 in 4bpp)
 
 
-// Clocks and X/Y positions selectors
+// X/Y positions selectors
 
 
-wire  [1:0] textResolution = {1'b0, ~res};//2'b0;
-reg        bitmapResolution = 0;
+reg  [1:0] textResolution;//  = tres;//2'b0;
+reg        bitmapResolution;// = bres;
 wire [1:0] expBitmapResolution = {1'b1, bitmapResolution};
 
-wire [9:0] xTree [4:0];
-assign xTree[0] = x;
-assign xTree[1] = x2;
-assign xTree[2] = x4;
-assign xTree[3] = x5;
-assign xTree[4] = x8;
-wire [9:0] yTree [4:0];
-assign yTree[0] = y;
-assign yTree[1] = y2;
-assign yTree[2] = y4;
-assign yTree[3] = y5;
-assign yTree[4] = y8;
+wire [9:0] xMux [4:0];
+assign xMux[0] = x;
+assign xMux[1] = x2;
+assign xMux[2] = x4;
+assign xMux[3] = x5;
+assign xMux[4] = x8;
+wire [9:0] yMux [4:0];
+assign yMux[0] = y;
+assign yMux[1] = y2;
+assign yMux[2] = y4;
+assign yMux[3] = y5;
+assign yMux[4] = y8;
 
-wire [9:0] textX   = videoMode ? xTree[     textResolution+1] : xTree[     textResolution];
-wire [9:0] textY   = videoMode ? yTree[     textResolution+1] : yTree[     textResolution];
-wire [9:0] bitmapX = videoMode ? xTree[expBitmapResolution+1] : xTree[expBitmapResolution];
-wire [9:0] bitmapY = videoMode ? yTree[expBitmapResolution+1] : yTree[expBitmapResolution];
+wire [9:0] textX   = videoMode ? xMux[     textResolution+1] : xMux[     textResolution];
+wire [9:0] textY   = videoMode ? yMux[     textResolution+1] : yMux[     textResolution];
+wire [9:0] bitmapX = videoMode ? xMux[expBitmapResolution+1] : xMux[expBitmapResolution];
+wire [9:0] bitmapY = videoMode ? yMux[expBitmapResolution+1] : yMux[expBitmapResolution];
 
 
 // Video Signal and Timing
@@ -254,16 +260,15 @@ wire VPOL  = videoMode ? VPOL_720  : VPOL_480;
 wire H_DE  = videoMode ? H_DE_720  : H_DE_480;
 wire V_DE  = videoMode ? V_DE_720  : V_DE_480;
 
+
 // Video compositon
 
 
 reg fontBit = 0;
-wire [15:0] RGB_out = fontBit ? fontColor : bitmapColor;
-wire [10:0] xLast = videoMode ? 11'd1279 : 11'd639;
-wire [10:0] yLast = videoMode ? 11'd719 : 11'd479;
+wire [15:0] RGB_out = fontBit ? fontColor : (bitmapColor | testColor);
 
 
-// Video pipelining
+// Video pipelining and output
 
 
 reg SYNC_H_delay1, SYNC_H_delay2;
@@ -306,18 +311,24 @@ end
 
 // 1280x720 = 921600 = 1110 0001 0000 0000 0000
 // 640x480 = 307200 =   100 1011 0000 0000 0000
-
-wire test_checker = x[4] ^ y[4];
-wire test_grid = (x[4:0] == 5'd15) | (y[4:0] == 5'd15);
-wire test_R = ((x == 0) | (x == xLast));
-wire test_G = ((y[9:0] == yLast[10:1]) | (x[9:0] == xLast[10:1]));
-wire test_B = ((y == 0) | (y == yLast));
+wire [10:0] xLast = /*videoMode ? 11'd1279 :*/ 11'd639;
+wire [10:0] yLast = videoMode ? /*11'd719*/ 11'd359 : 11'd479;
+wire [10:0] testX = xMux[videoMode];
+wire [10:0] testY = yMux[videoMode];
+wire test_checker = testX[4] ^ testY[4];
+wire test_grid = (testX[4:0] == 5'd15) | (testY[4:0] == 5'd15);
+wire test_R = ((testX == 0) | (testX == xLast));
+wire test_G = ((testY[9:0] == yLast[10:1]) | (testX[9:0] == xLast[10:1]));
+wire test_B = ((testY == 0) | (testY == yLast));
 wire test_RGB_underlay = 0;//test_checker & ~(test_R | test_G | test_B);
-reg [15:0] RGB_delay1, RGB_delay2;
+reg [15:0] testColor, RGB_delay1, RGB_delay2;
+
 
 reg [23:0] vcount = 0;
 always @(posedge XTAL_IN) begin
-    videoMode <= ~mode; 
+    videoMode <= vmode; 
+    textResolution <= tres;
+    bitmapResolution <= bres;
     led <= vcount[23];
     vcount <= vcount + 24'd1;
 end
@@ -328,7 +339,7 @@ always @(posedge pixelClock) begin
     RGB_delay1[15:11] <= (test_RGB_underlay | test_B) ?  5'b11111 : 0;
 
     RGB_delay2 <= RGB_delay1;
-    bitmapColor <= RGB_delay2;   
+    testColor <= RGB_delay2;   
 end
 
 
@@ -336,23 +347,19 @@ end
 
 
 // Text generator
+
+
 reg fontMode = 0; // 8x8, 1:8x16
-reg [7:0] charIndex;
-reg [15:0] fontColor = 16'b1111111111111111; //16'b0111101111101111;
-reg [13:0] fontAddress;
-reg [4:0] fontBitAddress;
+reg  [12:0] textOutAddress;
+wire [ 7:0] textDataOut;
+reg  [15:0] fontColor = 16'b1111111111111111; //16'b0111101111101111;
+reg  [13:0] fontAddress;
+reg  [ 4:0] fontBitAddress;
 wire [31:0] fontDataOut;
-//reg fontBit = fontDataOut[~fontAddress[4:0]]; // select 1 of 32 bits
+
 // 8x8 / 8x16
 // cursorX cursorY cursor 
-// font ROM
-// char RAM
-// 
-// RGB_x_out <= FontBit ? FontColor : BitmapColor
-// FontBit <= fontROM[char][fontOffset]
-// wire fontOffset 
-// char <= charRAM[textOffset] 
-// textOffset <= pixel[19:3]??
+
 reg [0:63] font = 64'b1000100001000001101000000001000110001000000001011000001000010001;
 //10001000
 //01000001
@@ -362,15 +369,36 @@ reg [0:63] font = 64'b1000100001000001101000000001000110001000000001011000001000
 //00000101
 //10000010
 //00010001
-wire [13:0] calculatedAddress = {charIndex, 6'd0} + {11'd0, textX[2:0]} + {8'd0, textY[2:0], 3'd0};
-//reg bitDelay3, bitDelay2, bitDelay1;
+
+
 always @(posedge pixelClock) begin    
-    charIndex <= textX[9:3] + (textY[6:3]*8'd80);
+    // step 1, textRAM address from screen X/Y position
+    textOutAddress <= textX[9:3] + (textY[9:3] * 13'd80);
+
+    // step 2, fontROM address from textRAM char index output
     fontAddress <= calculatedAddress;
-    fontBitAddress <= ~fontAddress[4:0];
+    fontBitAddress <= ~fontAddress[4:0]; // keep for 1 more step
+
+    // step 3, fontBit from fontROM font data output
     fontBit <= fontDataOut[fontBitAddress]; // select 1 of 32 bits
-   // fontBit <= bitDelay1;
 end
+
+
+Gowin_SDPB_4800_8 textRAM(
+    .dout(textDataOut), //output [7:0] dout
+    .clka(1'b0), //input clka
+    .cea(1'b0), //input cea
+    .reseta(1'b0), //input reseta
+    .clkb(romClock), //input clkb
+    .ceb(1'b1), //input ceb
+    .resetb(1'b0), //input resetb
+    .oce(1'd1), //input oce
+    .ada(13'd0), //input [12:0] ada
+    .din(8'd0), //input [7:0] din
+    .adb(textOutAddress) //input [12:0] adb
+);
+
+wire [13:0] calculatedAddress = {textDataOut, 6'd0} + {11'd0, textX[2:0]} + {8'd0, textY[2:0], 3'd0};
 
 // font ROM address calculations
 wire [5:0] fontYadr = fontAddress[10:5]; // 64 column
@@ -389,11 +417,57 @@ Gowin_User_Flash fontROM(
     .din(32'd0) //input [31:0] din
 );
 
-// Bitmap mode
+
+// Bitmap generator
+
+
+reg [15:0] palette[15:0];
+initial begin
+    palette[ 0] = 16'h0000;
+    palette[ 1] = 16'h2124;
+    palette[ 2] = 16'h4A49;
+    palette[ 3] = 16'h6B6D;
+    palette[ 4] = 16'h9492;
+    palette[ 5] = 16'hB5B6;
+    palette[ 6] = 16'hDEDB;
+    palette[ 7] = 16'hFFFF;
+    palette[ 8] = 16'h0000;
+    palette[ 9] = 16'h001F;
+    palette[10] = 16'h07E0;
+    palette[11] = 16'h07FF;
+    palette[12] = 16'hF800;
+    palette[13] = 16'hF81F;
+    palette[14] = 16'hFFE0;
+    palette[15] = 16'hFFFF;
+end
 
 reg [15:0] bitmapColor = 16'd0;
+wire [ 3:0] bitmapDataOut;
+reg [15:0] bitmapAddress;
+reg [ 3:0] bitmapColorIndex;
 //BitmapColor <= palette[colorIndex]
 //colorIndex <= bitmapRAM[pixelOffset] // ram fetch from address on clock up, inverting clock to fetch between latches
 // pixelOffset <= pixel // pixel updated on clock up
+always @(posedge pixelClock) begin    
+    // step 1, textRAM address from screen X/Y position
+    bitmapAddress <= {bitmapY[7:0], bitmapX[7:0]};// + (bitmapY << 8);
+    bitmapColorIndex <= bitmapDataOut;
+    bitmapColor <= palette[bitmapColorIndex];
+end
+
+
+Gowin_SDPB_36864_4 bitmapRAM(
+    .dout(bitmapDataOut), //output [3:0] dout
+    .clka(1'b0), //input clka
+    .cea(1'b0), //input cea
+    .reseta(1'b0), //input reseta
+    .clkb(romClock), //input clkb
+    .ceb(1'b1), //input ceb
+    .resetb(1'b0), //input resetb
+    .oce(1'b1), //input oce
+    .ada(16'd0), //input [15:0] ada
+    .din(4'd0), //input [3:0] din
+    .adb(bitmapAddress) //input [15:0] adb
+);
 
 endmodule
