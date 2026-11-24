@@ -361,16 +361,11 @@ reg [0:63] font = 64'b1000100001000001101000000001000110001000000001011000001000
 //00000101
 //10000010
 //00010001
-//wire [15:0] textROMaddressYselector = fontSize ? {6'd0, textY[3:0], 4'd0} : {8'd0, textY[2:0], 3'd0};
-//wire [12:0] textRAMaddressYselector = fontSize ? (textY[8:4] * 13'd80) : (textY[8:3] * 13'd80);
-//wire [15:0] textCharSelector = fontSize ? {textDataOut, 6'd0} : {textDataOut, 6'd0};// x128 / x64
-//wire [15:0] calculatedROMAddress = (fontSize ? 13'h0800 : 0) + textCharSelector + {11'd0, textX20} + textROMaddressYselector;
 
-
-wire [15:0] textROMaddressYselector = {9'd0, textY[3:0], 3'd0}; // 8:16 *8 7 bits
-wire [12:0] textRAMaddressYselector = (textY[8:3] * 13'd80); // X/8 max 80, Y/8:16 max 60:30, address max 4800:2400  13bits
-wire [14:0] textCharSelector =  {textX[9:3] + 8'h41, 7'd0};// x128 / x64   8b x 6:7b 15 bits
-wire [17:0] calculatedROMAddress = ( 18'h04000 ) + textCharSelector + {15'd0, textX20} + textROMaddressYselector;
+wire [15:0] textROMaddressYselector = fontSize ? {9'd0, textY[3:0], 3'd0} : {10'd0, textY[2:0], 3'd0}; // 8:16 *8 7 bits
+wire [12:0] textRAMaddressYselector = fontSize ? (textY[8:4] * 13'd80)    : (textY[8:3] * 13'd80);     // X/8 max 80, Y/8:16 max 60:30, address max 4800:2400  13bits
+wire [14:0] textCharSelector        = fontSize ? {textDataOut, 7'd0}      : {textDataOut, 6'd0};       // x128 / x64   8b x 6:7b 15 bits
+wire [17:0] calculatedROMAddress =  ( fontSize ? 18'h04000 : 0 ) + textCharSelector + {15'd0, textX20} + textROMaddressYselector;
 
 always @(posedge pixelClock) begin    
     // step 1, textRAM address from screen X/Y position
